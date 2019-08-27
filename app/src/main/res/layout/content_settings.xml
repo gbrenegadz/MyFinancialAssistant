@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.15" />
+            app:layout_constraintGuide_percent="0.12" />
 
         <TextView
             android:id="@+id/setup_header"
@@ -25,48 +25,92 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/setup_header"
+            android:padding="@dimen/dp8"
             android:textColor="@color/colorAccent"
             android:textStyle="bold"
             android:textSize="@dimen/text_h6"
             app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/txt_category"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/ll_category_cont"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/category_title"
-            android:textSize="@dimen/text_h6"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:padding="@dimen/dp8"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
-            app:layout_constraintTop_toBottomOf="@+id/setup_header" />
+            app:layout_constraintTop_toBottomOf="@+id/setup_header">
 
-        <TextView
-            android:id="@+id/txt_category_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_new_category"
-            android:textSize="@dimen/text_subtitle_2"
-            app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_category" />
+            <TextView
+                android:id="@+id/txt_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/category_title"
+                android:textSize="@dimen/text_h6" />
 
-        <TextView
-            android:id="@+id/txt_budget"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/budget_title"
-            android:textSize="@dimen/text_h6"
-            app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_category_subtitle" />
+            <TextView
+                android:id="@+id/txt_category_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_new_category"
+                android:textSize="@dimen/text_subtitle_2" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txt_budget_subtitle"
+        <LinearLayout
+            android:id="@+id/ll_budget_cont"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:padding="@dimen/dp8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
+            app:layout_constraintTop_toBottomOf="@+id/ll_category_cont">
+
+            <TextView
+                android:id="@+id/txt_budget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/budget_title"
+                android:textSize="@dimen/text_h6" />
+
+            <TextView
+                android:id="@+id/txt_budget_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/budget_setting_subtitle"
+                android:textSize="@dimen/text_subtitle_2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_salary_deduction_cont"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:padding="@dimen/dp8"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
+            app:layout_constraintTop_toBottomOf="@+id/ll_budget_cont">
+
+            <TextView
+            android:id="@+id/txt_salary_deduction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/budget_setting_subtitle"
-            android:textSize="@dimen/text_subtitle_2"
-            app:layout_constraintStart_toStartOf="@+id/guideline_15_percent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_budget" />
+            android:text="@string/salary_deduction"
+            android:textSize="@dimen/text_h6" />
+
+            <TextView
+            android:id="@+id/txt_salary_deduction_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/salary_deduction_subtitle"
+            android:textSize="@dimen/text_subtitle_2" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

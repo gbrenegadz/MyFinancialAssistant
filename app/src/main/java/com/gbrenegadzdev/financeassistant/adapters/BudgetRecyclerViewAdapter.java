@@ -45,29 +45,31 @@ public class BudgetRecyclerViewAdapter extends RealmRecyclerViewAdapter<Budget, 
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder viewHolder, int position) {
-        final Budget budget = getData().get(position);
-        if (budget != null) {
-            final StringUtils stringUtils = new StringUtils();
-            viewHolder.mBudgetName.setText(budget.getBudgetName());
-            viewHolder.mBudgetAmount.setText(stringUtils.getDecimal2(budget.getAmount()));
+        if (getData() != null) {
+            final Budget budget = getData().get(position);
+            if (budget != null) {
+                final StringUtils stringUtils = new StringUtils();
+                viewHolder.mBudgetName.setText(budget.getBudgetName());
+                viewHolder.mBudgetAmount.setText(stringUtils.getDecimal2(budget.getAmount()));
 
-            viewHolder.mUpdate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (clickListener != null) {
-                        clickListener.onUpdate(view, budget);
+                viewHolder.mUpdate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (clickListener != null) {
+                            clickListener.onUpdate(view, budget);
+                        }
                     }
-                }
-            });
+                });
 
-            viewHolder.mDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (clickListener != null) {
-                        clickListener.onDelete(view, budget);
+                viewHolder.mDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (clickListener != null) {
+                            clickListener.onDelete(view, budget);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 

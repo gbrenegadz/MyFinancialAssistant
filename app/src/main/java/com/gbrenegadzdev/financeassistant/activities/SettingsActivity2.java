@@ -10,6 +10,7 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.gbrenegadzdev.financeassistant.R;
 
+@Deprecated
 public class SettingsActivity2 extends AppCompatActivity {
 
     @Override

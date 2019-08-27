@@ -11,8 +11,8 @@ public class SnackbarUtils {
                 .setAction(actionText, clickListener);
     }
 
-    public Snackbar create(View view, String text) {
+    public Snackbar create(View view, String text, View.OnClickListener clickListener) {
         return Snackbar.make(view, text, Snackbar.LENGTH_LONG)
-                .setAction("OK", null);
+                .setAction("OK", clickListener);
     }
 }

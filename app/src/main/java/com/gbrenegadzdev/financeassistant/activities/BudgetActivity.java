@@ -57,21 +57,17 @@ public class BudgetActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        budgetRealm = Realm.getDefaultInstance();
+        setupRealm();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_budget);
-
-        final RealmResults<Budget> budgets = budgetRealm.where(Budget.class)
-                .findAll();
-        if (budgets != null) {
-            for (Budget budget : budgets) {
-                Log.d(TAG, "Budget : " + budget.toString());
-            }
-        }
 
         initUI();
         queryBudget();
         initListeners();
+    }
+
+    private void setupRealm() {
+        budgetRealm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -179,13 +175,30 @@ public class BudgetActivity extends AppCompatActivity {
 
                                         realm.insert(newBudget);
 
-                                        snackbarUtils.create(view, getString(R.string.new_budget_has_been_added).concat(" \"").concat(newBudget.getBudgetName()).concat("\"")).show();
+                                        // Show Snackbar notification
+                                        snackbarUtils.create(view,
+                                                getString(R.string.budget_added).concat(" \"").concat(newBudget.getBudgetName()).concat("\""),
+                                                new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        dialogInterface.dismiss();
+                                                    }
+                                                }).show();
                                     } else if (action == BUDGET_UPDATE) {
                                         selectedBudget.setBudgetName(finalName);
                                         selectedBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
                                         realm.insertOrUpdate(selectedBudget);
 
-                                        snackbarUtils.create(view, getString(R.string.budget_has_been_updated).concat(" \"").concat(selectedBudget.getBudgetName()).concat("\"")).show();
+
+                                        // Show Snackbar notification
+                                        snackbarUtils.create(view,
+                                                getString(R.string.budget_updated).concat(" \"").concat(selectedBudget.getBudgetName()).concat("\""),
+                                                new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+
+                                                    }
+                                                }).show();
                                     }
                                 } catch (RealmException e) {
                                     e.printStackTrace();
@@ -219,14 +232,22 @@ public class BudgetActivity extends AppCompatActivity {
             dialogUtils.showYesNoDialog(this, getString(R.string.delete_budget_question),
                     new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                        public void onClick(final DialogInterface dialogInterface, int i) {
                             budgetRealm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
                                     forDeleteBudget.deleteFromRealm();
                                     mAdapter.notifyDataSetChanged();
 
-                                    snackbarUtils.create(view, getString(R.string.budget_deleted).concat(" \"").concat(budgetName).concat("\"")).show();
+                                    // Show Snackbar notification
+                                    snackbarUtils.create(view,
+                                            getString(R.string.budget_deleted).concat(" \"").concat(budgetName).concat("\""),
+                                            new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    dialogInterface.dismiss();
+                                                }
+                                            }).show();
                                 }
                             });
                         }
@@ -260,6 +281,7 @@ public class BudgetActivity extends AppCompatActivity {
         if (budgets != null && !budgets.isEmpty()) {
             mAdapter = new BudgetRecyclerViewAdapter(budgets, true);
             mLayoutManager = new LinearLayoutManager(this);
+            ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
             mRecyclerView.setLayoutManager(mLayoutManager);
             mRecyclerView.setAdapter(mAdapter);
 
