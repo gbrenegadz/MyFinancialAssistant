@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,20 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gbrenegadzdev.financeassistant.R;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
-import com.gbrenegadzdev.financeassistant.models.realm.SalaryDeductionSetup;
+import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
 
 import io.realm.OrderedRealmCollection;
-import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
-import io.realm.exceptions.RealmException;
 
-public class SalaryDeductionRecyclerViewAdapter extends RealmRecyclerViewAdapter<SalaryDeductionSetup, SalaryDeductionRecyclerViewAdapter.MyViewHolder> {
-    private static final String TAG = SalaryDeductionRecyclerViewAdapter.class.getSimpleName();
+public class CategorySetupRecyclerViewAdapter extends RealmRecyclerViewAdapter<CategorySetup, CategorySetupRecyclerViewAdapter.MyViewHolder> {
+    private static final String TAG = CategorySetupRecyclerViewAdapter.class.getSimpleName();
     private SnackbarUtils snackbarUtils = new SnackbarUtils();
     private ClickListener clickListener;
 
-    public SalaryDeductionRecyclerViewAdapter(@Nullable OrderedRealmCollection<SalaryDeductionSetup> data, boolean autoUpdate) {
+    public CategorySetupRecyclerViewAdapter(@Nullable OrderedRealmCollection<CategorySetup> data, boolean autoUpdate) {
         super(data, autoUpdate);
     }
 
@@ -40,33 +37,25 @@ public class SalaryDeductionRecyclerViewAdapter extends RealmRecyclerViewAdapter
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.constraint_row_salary_deduction_setup, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.constraint_row_category_setup, parent, false);
         return new MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder viewHolder, int position) {
         if (getData() != null) {
-            final SalaryDeductionSetup salaryDeductionSetup = getData().get(position);
-            if (salaryDeductionSetup != null) {
-                Log.e(TAG, "Salary Deduction Setup : " + salaryDeductionSetup.toString());
-                viewHolder.mDeductionName.setText(salaryDeductionSetup.getDeductionName());
-                viewHolder.mSelected.setChecked(salaryDeductionSetup.isSelected());
-
-                viewHolder.mSelected.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (clickListener != null) {
-                            clickListener.onSelect(view, salaryDeductionSetup);
-                        }
-                    }
-                });
+            final CategorySetup categorySetup = getData().get(position);
+            if (categorySetup != null) {
+                Log.e(TAG, "Category Setup : " + categorySetup.toString());
+                viewHolder.mDeductionName.setText(categorySetup.getCategoryName());
+                viewHolder.mUpdate.setVisibility(categorySetup.isEditable() ? View.VISIBLE : View.GONE);
+                viewHolder.mDelete.setVisibility(categorySetup.isDeletable() ? View.VISIBLE : View.GONE);
 
                 viewHolder.mUpdate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (clickListener != null) {
-                            clickListener.onUpdate(view, salaryDeductionSetup);
+                            clickListener.onUpdate(view, categorySetup);
                         }
                     }
                 });
@@ -75,7 +64,7 @@ public class SalaryDeductionRecyclerViewAdapter extends RealmRecyclerViewAdapter
                     @Override
                     public void onClick(View view) {
                         if (clickListener != null) {
-                            clickListener.onDelete(view, salaryDeductionSetup);
+                            clickListener.onDelete(view, categorySetup);
                         }
                     }
                 });
@@ -88,14 +77,12 @@ public class SalaryDeductionRecyclerViewAdapter extends RealmRecyclerViewAdapter
         private TextView mDeductionName;
         private ImageButton mDelete;
         private ImageButton mUpdate;
-        private CheckBox mSelected;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             mImage = itemView.findViewById(R.id.image);
-            mDeductionName = itemView.findViewById(R.id.txt_deduction_name);
+            mDeductionName = itemView.findViewById(R.id.txt_category_name);
             mDelete = itemView.findViewById(R.id.ibtn_delete);
             mUpdate = itemView.findViewById(R.id.ibtn_update);
-            mSelected = itemView.findViewById(R.id.cb_selected);
         }
     }
 }

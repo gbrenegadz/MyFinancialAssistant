@@ -19,10 +19,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:background="@color/colorAccent"
+        android:clickable="true"
+        android:focusable="true"
         android:text="@string/add"
-        app:layout_constraintCircleRadius="@dimen/dp4"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintCircleRadius="@dimen/dp4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

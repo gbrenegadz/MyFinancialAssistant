@@ -64,6 +64,15 @@
     <string name="deduction_deleted">Deduction deleted</string>
     <string name="budget_updated">Budget updated</string>
     <string name="budget_added">Budget added</string>
+    <string name="title_activity_setup_category">SetupCategory</string>
+    <string name="setup_category">Setup Category</string>
+    <string name="category_name">Category Name</string>
+    <string name="category_already_exist">Category already exist</string>
+    <string name="category_added">Category added</string>
+    <string name="category_updated">Category updated</string>
+    <string name="delete_category_question">Delete Category?</string>
+    <string name="category_deleted">Category deleted</string>
+    <string name="new_category">New Category</string>
 
     <!-- Sync Preferences -->
     <!--<string name="sync_title">Sync email periodically</string>-->

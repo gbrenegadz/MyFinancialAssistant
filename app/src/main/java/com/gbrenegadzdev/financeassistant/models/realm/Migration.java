@@ -31,13 +31,22 @@ public class Migration implements RealmMigration {
                 budgetSchema.addField(Budget.MODIFIED_DATETIME, Date.class);
             }
 
-            RealmObjectSchema salaryDeductionSchema = schema.get(SalaryDeductionSetup.class.getSimpleName());
-            if (salaryDeductionSchema != null) {
-                salaryDeductionSchema.addField(SalaryDeductionSetup.SALARY_DEDUCTION_ID, String.class);
-                salaryDeductionSchema.addField(SalaryDeductionSetup.DEDUCTION_NAME, String.class);
-                salaryDeductionSchema.addField(SalaryDeductionSetup.CREATED_DATETIME, Date.class);
-                salaryDeductionSchema.addField(SalaryDeductionSetup.MODIFIED_DATETIME, Date.class);
-                salaryDeductionSchema.addField(SalaryDeductionSetup.IS_SELECTED, boolean.class);
+            RealmObjectSchema salaryDeductionSetupSchema = schema.get(SalaryDeductionSetup.class.getSimpleName());
+            if (salaryDeductionSetupSchema != null) {
+                salaryDeductionSetupSchema.addField(SalaryDeductionSetup.SALARY_DEDUCTION_ID, String.class);
+                salaryDeductionSetupSchema.addField(SalaryDeductionSetup.DEDUCTION_NAME, String.class);
+                salaryDeductionSetupSchema.addField(SalaryDeductionSetup.CREATED_DATETIME, Date.class);
+                salaryDeductionSetupSchema.addField(SalaryDeductionSetup.MODIFIED_DATETIME, Date.class);
+                salaryDeductionSetupSchema.addField(SalaryDeductionSetup.IS_SELECTED, boolean.class);
+            }
+
+            RealmObjectSchema categorySetupSchema = schema.get(CategorySetup.class.getSimpleName());
+            if (categorySetupSchema != null) {
+                categorySetupSchema.addField(CategorySetup.CATEGORY_ID, String.class);
+                categorySetupSchema.addField(CategorySetup.CATEGORY_NAME, String.class);
+                categorySetupSchema.addField(CategorySetup.CREATED_DATETIME, Date.class);
+                categorySetupSchema.addField(CategorySetup.IS_EDITABLE, boolean.class);
+                categorySetupSchema.addField(CategorySetup.IS_DELETABLE, boolean.class);
             }
         }
     }

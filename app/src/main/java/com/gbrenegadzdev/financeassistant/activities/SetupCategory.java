@@ -2,21 +2,6 @@ package com.gbrenegadzdev.financeassistant.activities;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-
-import com.gbrenegadzdev.financeassistant.adapters.BudgetRecyclerViewAdapter;
-import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
-import com.gbrenegadzdev.financeassistant.models.realm.Budget;
-import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
-import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
-import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
-import com.gbrenegadzdev.financeassistant.utils.StringUtils;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,7 +9,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.gbrenegadzdev.financeassistant.R;
+import com.gbrenegadzdev.financeassistant.adapters.CategorySetupRecyclerViewAdapter;
+import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
+import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
+import com.gbrenegadzdev.financeassistant.models.realm.SalaryDeductionSetup;
+import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
+import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
+import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
+import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Date;
@@ -38,76 +36,63 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
-public class BudgetActivity extends AppCompatActivity {
-    private static final String TAG = BudgetActivity.class.getSimpleName();
-    private static int BUDGET_ADD = 1;
-    private static int BUDGET_UPDATE = 2;
-    private Realm budgetRealm;
+public class SetupCategory extends AppCompatActivity {
+    private static final String TAG = SetupCategory.class.getSimpleName();
+    private static int CATEGORY_ADD = 1;
+    private static int CATEGORY_UPDATE = 2;
+    private Realm setupCategoryRealm;
 
     final DateTimeUtils dateTimeUtils = new DateTimeUtils();
     final DialogUtils dialogUtils = new DialogUtils();
     final StringUtils stringUtils = new StringUtils();
     final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
-    private Button mAdd;
-    private RecyclerView mRecyclerView;
+    private CategorySetupRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private BudgetRecyclerViewAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private Button mAdd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setupRealm();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_budget);
+        setContentView(R.layout.activity_setup_category);
 
         initUI();
-        queryBudget();
+        queryCategory();
         initListeners();
     }
 
     private void setupRealm() {
-        budgetRealm = Realm.getDefaultInstance();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            budgetRealm.close();
-        } catch (RealmException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-        }
+        setupCategoryRealm = Realm.getDefaultInstance();
     }
 
     private void initUI() {
-        mAdd = findViewById(R.id.btn_add);
         mRecyclerView = findViewById(R.id.recycler_view);
+        mAdd = findViewById(R.id.btn_add);
     }
 
     private void initListeners() {
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(final View view) {
-                showAddUpdateBudgetDialog(view, BUDGET_ADD, null);
+            public void onClick(View view) {
+                showAddUpdateBudgetDialog(view, CATEGORY_ADD, null);
             }
         });
     }
 
-    private void queryBudget() {
+    private void queryCategory() {
         try {
-            final RealmResults<Budget> budgetRealmResults = budgetRealm.where(Budget.class)
+            final RealmResults<CategorySetup> salaryDeductionSetupRealmResults = setupCategoryRealm.where(CategorySetup.class)
                     .findAllAsync();
-            budgetRealmResults.isLoaded();
-            budgetRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Budget>>() {
+            salaryDeductionSetupRealmResults.isLoaded();
+            salaryDeductionSetupRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<CategorySetup>>() {
                 @Override
-                public void onChange(RealmResults<Budget> budgets, OrderedCollectionChangeSet changeSet) {
-                    if (budgets.isValid()) {
-                        populateBudgetList(budgets);
+                public void onChange(RealmResults<CategorySetup> categorySetupRealmResults, OrderedCollectionChangeSet changeSet) {
+                    if (categorySetupRealmResults.isValid()) {
+                        populateSalaryDeductionList(categorySetupRealmResults);
                     }
                 }
             });
@@ -120,8 +105,8 @@ public class BudgetActivity extends AppCompatActivity {
         }
     }
 
-    private void populateBudgetList(RealmResults<Budget> budgets) {
-        mAdapter = new BudgetRecyclerViewAdapter(budgets, true);
+    private void populateSalaryDeductionList(RealmResults<CategorySetup> categorySetupRealmResults) {
+        mAdapter = new CategorySetupRecyclerViewAdapter(categorySetupRealmResults, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -130,12 +115,21 @@ public class BudgetActivity extends AppCompatActivity {
         mAdapter.setOnClickListener(new ClickListener() {
             @Override
             public void onSelect(View view, RealmObject realmObject) {
-
+                final SalaryDeductionSetup salaryDeductionSetup = (SalaryDeductionSetup) realmObject;
+                if (salaryDeductionSetup != null) {
+                    setupCategoryRealm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            salaryDeductionSetup.setSelected(!salaryDeductionSetup.isSelected());
+                            realm.insertOrUpdate(salaryDeductionSetup);
+                        }
+                    });
+                }
             }
 
             @Override
             public void onUpdate(View view, RealmObject realmObject) {
-                showAddUpdateBudgetDialog(view, BUDGET_UPDATE, realmObject);
+                showAddUpdateBudgetDialog(view, CATEGORY_UPDATE, realmObject);
             }
 
             @Override
@@ -152,18 +146,16 @@ public class BudgetActivity extends AppCompatActivity {
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 
         mValue.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        mValue.setVisibility(View.GONE);
 
         // Check if action is for Updating
-        // If Yes, then query the current Budget to edit
-        final Budget selectedBudget = (Budget) realmObject;
-        if (selectedBudget != null) {
-            if (action == BUDGET_UPDATE) {
-                mName.setText(selectedBudget.getBudgetName());
-                mValue.setText(stringUtils.getDecimal2(selectedBudget.getAmount()));
-            }
+        // If Yes, then query the current Salary Deduction to edit
+        final CategorySetup categorySetup = (CategorySetup) realmObject;
+        if (action == CATEGORY_UPDATE) {
+            mName.setText(categorySetup.getCategoryName());
         }
 
-        final AlertDialog alertDialog = dialogUtils.showCustomDialog(BudgetActivity.this, getString(R.string.add_budget),
+        final AlertDialog alertDialog = dialogUtils.showCustomDialog(SetupCategory.this, getString(R.string.new_category),
                 getString(R.string.save), getString(R.string.cancel),
                 mAlertDialogCustomerView,
                 new DialogInterface.OnClickListener() {
@@ -180,27 +172,18 @@ public class BudgetActivity extends AppCompatActivity {
                             }
                         }
 
-                        if (mValue.getText() != null) {
-                            value = mValue.getText().toString();
-                            if (TextUtils.isEmpty(value)) {
-                                mValue.setError(getString(R.string.required));
-                                return;
-                            }
-                        }
-
                         final String finalName = name;
-                        final String finalValue = value;
-                        budgetRealm.executeTransaction(new Realm.Transaction() {
+                        setupCategoryRealm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
                                 try {
-                                    if (action == BUDGET_ADD) {
+                                    if (action == CATEGORY_ADD) {
                                         // Check if name already exist
-                                        final Budget searchBudget = realm.where(Budget.class)
-                                                .equalTo(Budget.BUDGET_NAME, finalName, Case.INSENSITIVE)
+                                        final CategorySetup categorySetup = realm.where(CategorySetup.class)
+                                                .equalTo(CategorySetup.CATEGORY_NAME, finalName, Case.INSENSITIVE)
                                                 .findFirst();
-                                        if (searchBudget != null) {
-                                            snackbarUtils.createIndefinite(view, getString(R.string.budget_already_exist),
+                                        if (categorySetup != null) {
+                                            snackbarUtils.createIndefinite(view, getString(R.string.category_already_exist),
                                                     getString(R.string.close), new View.OnClickListener() {
                                                         @Override
                                                         public void onClick(View view) {
@@ -212,40 +195,34 @@ public class BudgetActivity extends AppCompatActivity {
 
 
                                         final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
-                                        final Budget newBudget = new Budget();
-                                        newBudget.setBudgetId(UUID.randomUUID().toString());
-                                        newBudget.setBudgetName(finalName);
-                                        newBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                                        newBudget.setCategory("");
-                                        newBudget.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
-                                        newBudget.setYear(dateTimeUtils.getIntYear(currentDatetime));
-                                        newBudget.setCreatedDatetime(currentDatetime);
-                                        newBudget.setModifiedDatetime(currentDatetime);
+                                        final CategorySetup newCategory = new CategorySetup();
+                                        newCategory.setCategoryId(UUID.randomUUID().toString());
+                                        newCategory.setCategoryName(finalName);
+                                        newCategory.setCreatedDatetime(currentDatetime);
+                                        newCategory.setEditable(true);
+                                        newCategory.setDeletable(true);
 
-                                        realm.insert(newBudget);
+                                        realm.insert(newCategory);
 
                                         // Show Snackbar notification
                                         snackbarUtils.create(view,
-                                                getString(R.string.budget_added).concat(" \"").concat(newBudget.getBudgetName()).concat("\""),
+                                                getString(R.string.category_added).concat(" \"").concat(newCategory.getCategoryName()).concat("\""),
                                                 new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View view) {
                                                         dialogInterface.dismiss();
                                                     }
                                                 }).show();
-                                    } else if (action == BUDGET_UPDATE) {
-                                        selectedBudget.setBudgetName(finalName);
-                                        selectedBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                                        realm.insertOrUpdate(selectedBudget);
+                                    } else if (action == CATEGORY_UPDATE) {
+                                        categorySetup.setCategoryName(finalName);
+                                        realm.insertOrUpdate(categorySetup);
 
-
-                                        // Show Snackbar notification
                                         snackbarUtils.create(view,
-                                                getString(R.string.budget_updated).concat(" \"").concat(selectedBudget.getBudgetName()).concat("\""),
+                                                getString(R.string.category_updated).concat(" \"").concat(categorySetup.getCategoryName()).concat("\""),
                                                 new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View view) {
-
+                                                        dialogInterface.dismiss();
                                                     }
                                                 }).show();
                                     }
@@ -275,22 +252,21 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     private void showDeleteDialog(final View view, RealmObject realmObject) {
-        final Budget forDeleteBudget = (Budget) realmObject;
-        if (forDeleteBudget != null) {
-            final String budgetName = forDeleteBudget.getBudgetName();
-            dialogUtils.showYesNoDialog(this, getString(R.string.delete_budget_question),
+        final CategorySetup categorySetup = (CategorySetup) realmObject;
+        if (categorySetup != null) {
+            final String categoryName = categorySetup.getCategoryName();
+            dialogUtils.showYesNoDialog(this, getString(R.string.delete_category_question),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialogInterface, int i) {
-                            budgetRealm.executeTransaction(new Realm.Transaction() {
+                            setupCategoryRealm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    forDeleteBudget.deleteFromRealm();
+                                    categorySetup.deleteFromRealm();
                                     mAdapter.notifyDataSetChanged();
 
-                                    // Show Snackbar notification
                                     snackbarUtils.create(view,
-                                            getString(R.string.budget_deleted).concat(" \"").concat(budgetName).concat("\""),
+                                            getString(R.string.category_deleted).concat(" \"").concat(categoryName).concat("\""),
                                             new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
@@ -303,4 +279,5 @@ public class BudgetActivity extends AppCompatActivity {
                     }).show();
         }
     }
+
 }

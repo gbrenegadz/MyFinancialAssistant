@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gbrenegadzdev.financeassistant.R;
-import com.gbrenegadzdev.financeassistant.adapters.SalaryDeductionRecyclerViewAdapter;
+import com.gbrenegadzdev.financeassistant.adapters.SalaryDeductionSetupRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.SalaryDeductionSetup;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
@@ -46,7 +46,7 @@ public class SetupSalaryDeductionActivity extends AppCompatActivity {
     final StringUtils stringUtils = new StringUtils();
     final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
-    private SalaryDeductionRecyclerViewAdapter mAdapter;
+    private SalaryDeductionSetupRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private RecyclerView mRecyclerView;
@@ -113,39 +113,37 @@ public class SetupSalaryDeductionActivity extends AppCompatActivity {
     }
 
     private void populateSalaryDeductionList(RealmResults<SalaryDeductionSetup> salaryDeductionSetups) {
-        if (salaryDeductionSetups != null && !salaryDeductionSetups.isEmpty()) {
-            mAdapter = new SalaryDeductionRecyclerViewAdapter(salaryDeductionSetups, true);
-            mLayoutManager = new LinearLayoutManager(this);
-            ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mRecyclerView.setAdapter(mAdapter);
+        mAdapter = new SalaryDeductionSetupRecyclerViewAdapter(salaryDeductionSetups, true);
+        mLayoutManager = new LinearLayoutManager(this);
+        ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
 
-            mAdapter.setOnClickListener(new ClickListener() {
-                @Override
-                public void onSelect(View view, RealmObject realmObject) {
-                    final SalaryDeductionSetup salaryDeductionSetup = (SalaryDeductionSetup) realmObject;
-                    if (salaryDeductionSetup != null) {
-                        setupDeductionRealm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                salaryDeductionSetup.setSelected(!salaryDeductionSetup.isSelected());
-                                realm.insertOrUpdate(salaryDeductionSetup);
-                            }
-                        });
-                    }
+        mAdapter.setOnClickListener(new ClickListener() {
+            @Override
+            public void onSelect(View view, RealmObject realmObject) {
+                final SalaryDeductionSetup salaryDeductionSetup = (SalaryDeductionSetup) realmObject;
+                if (salaryDeductionSetup != null) {
+                    setupDeductionRealm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            salaryDeductionSetup.setSelected(!salaryDeductionSetup.isSelected());
+                            realm.insertOrUpdate(salaryDeductionSetup);
+                        }
+                    });
                 }
+            }
 
-                @Override
-                public void onUpdate(View view, RealmObject realmObject) {
-                    showAddUpdateBudgetDialog(view, SALARY_DEDUCTION_UPDATE, realmObject);
-                }
+            @Override
+            public void onUpdate(View view, RealmObject realmObject) {
+                showAddUpdateBudgetDialog(view, SALARY_DEDUCTION_UPDATE, realmObject);
+            }
 
-                @Override
-                public void onDelete(View view, RealmObject realmObject) {
-                    showDeleteDialog(view, realmObject);
-                }
-            });
-        }
+            @Override
+            public void onDelete(View view, RealmObject realmObject) {
+                showDeleteDialog(view, realmObject);
+            }
+        });
     }
 
     private void showAddUpdateBudgetDialog(final View view, final int action, RealmObject realmObject) {
@@ -160,8 +158,10 @@ public class SetupSalaryDeductionActivity extends AppCompatActivity {
         // Check if action is for Updating
         // If Yes, then query the current Salary Deduction to edit
         final SalaryDeductionSetup selectedSalaryDeductionSetup = (SalaryDeductionSetup) realmObject;
-        if (action == SALARY_DEDUCTION_UPDATE) {
-            mName.setText(selectedSalaryDeductionSetup.getDeductionName());
+        if (selectedSalaryDeductionSetup != null) {
+            if (action == SALARY_DEDUCTION_UPDATE) {
+                mName.setText(selectedSalaryDeductionSetup.getDeductionName());
+            }
         }
 
         final AlertDialog alertDialog = dialogUtils.showCustomDialog(SetupSalaryDeductionActivity.this, getString(R.string.new_salary_deduction),

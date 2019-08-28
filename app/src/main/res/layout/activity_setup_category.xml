@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.SetupSalaryDeductionActivity">
+    tools:context=".activities.SetupCategory">
 
     <include
-        layout="@layout/content_setup_salary_deduction"
+        layout="@layout/content_setup_category"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_add"

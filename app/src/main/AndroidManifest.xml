@@ -15,6 +15,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".activities.SetupCategory"
+            android:label="@string/setup_category"
+            android:parentActivityName=".activities.SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gbrenegadzdev.financeassistant.activities.SettingsActivity" />
+        </activity>
+        <activity
             android:name=".activities.SetupSalaryDeductionActivity"
             android:label="@string/setup_salary_deduction"
             android:parentActivityName=".activities.SettingsActivity">

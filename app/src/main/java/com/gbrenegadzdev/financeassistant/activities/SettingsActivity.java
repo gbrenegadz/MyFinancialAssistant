@@ -18,6 +18,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
     private LinearLayout mSalaryDeductionCont;
+    private LinearLayout mCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +30,19 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initUI() {
+        mCategory = findViewById(R.id.ll_category_cont);
         mSalaryDeductionCont = findViewById(R.id.ll_salary_deduction_cont);
     }
 
     private void initListeners() {
+        mCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SettingsActivity.this, SetupCategory.class);
+                startActivity(intent);
+            }
+        });
+
         mSalaryDeductionCont.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
