@@ -37,6 +37,7 @@ public class Migration implements RealmMigration {
                 salaryDeductionSchema.addField(SalaryDeductionSetup.DEDUCTION_NAME, String.class);
                 salaryDeductionSchema.addField(SalaryDeductionSetup.CREATED_DATETIME, Date.class);
                 salaryDeductionSchema.addField(SalaryDeductionSetup.MODIFIED_DATETIME, Date.class);
+                salaryDeductionSchema.addField(SalaryDeductionSetup.IS_SELECTED, boolean.class);
             }
         }
     }

@@ -9,11 +9,13 @@ public class SalaryDeductionSetup extends RealmObject {
     public static final String DEDUCTION_NAME = "deductionName";
     public static final String CREATED_DATETIME = "createdDatetime";
     public static final String MODIFIED_DATETIME = "modifiedDatetime";
+    public static final String IS_SELECTED = "isSelected";
 
     private String salaryDeductionId;
     private String deductionName;
     private Date createdDatetime;
     private Date modifiedDatetime;
+    private boolean isSelected;
 
     public String getSalaryDeductionId() {
         return salaryDeductionId;
@@ -47,6 +49,14 @@ public class SalaryDeductionSetup extends RealmObject {
         this.modifiedDatetime = modifiedDatetime;
     }
 
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
     @Override
     public String toString() {
         return "SalaryDeductionSetup{" +
@@ -54,6 +64,7 @@ public class SalaryDeductionSetup extends RealmObject {
                 ", deductionName='" + deductionName + '\'' +
                 ", createdDatetime=" + createdDatetime +
                 ", modifiedDatetime=" + modifiedDatetime +
+                ", isSelected=" + isSelected +
                 '}';
     }
 }

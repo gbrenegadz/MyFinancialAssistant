@@ -123,7 +123,16 @@ public class SetupSalaryDeductionActivity extends AppCompatActivity {
             mAdapter.setOnClickListener(new ClickListener() {
                 @Override
                 public void onSelect(View view, RealmObject realmObject) {
-
+                    final SalaryDeductionSetup salaryDeductionSetup = (SalaryDeductionSetup) realmObject;
+                    if (salaryDeductionSetup != null) {
+                        setupDeductionRealm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                salaryDeductionSetup.setSelected(!salaryDeductionSetup.isSelected());
+                                realm.insertOrUpdate(salaryDeductionSetup);
+                            }
+                        });
+                    }
                 }
 
                 @Override
