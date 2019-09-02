@@ -19,6 +19,8 @@ import com.gbrenegadzdev.financeassistant.adapters.CategorySetupRecyclerViewAdap
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
 import com.gbrenegadzdev.financeassistant.models.realm.SalaryDeductionSetup;
+import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
+import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
@@ -32,6 +34,7 @@ import io.realm.Case;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
@@ -42,10 +45,10 @@ public class SetupCategory extends AppCompatActivity {
     private static int CATEGORY_UPDATE = 2;
     private Realm setupCategoryRealm;
 
-    final DateTimeUtils dateTimeUtils = new DateTimeUtils();
-    final DialogUtils dialogUtils = new DialogUtils();
-    final StringUtils stringUtils = new StringUtils();
-    final SnackbarUtils snackbarUtils = new SnackbarUtils();
+    private DateTimeUtils dateTimeUtils = new DateTimeUtils();
+    private final DialogUtils dialogUtils = new DialogUtils();
+    private final StringUtils stringUtils = new StringUtils();
+    private final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
     private CategorySetupRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -61,6 +64,7 @@ public class SetupCategory extends AppCompatActivity {
         setContentView(R.layout.activity_setup_category);
 
         initUI();
+        setupDefaultCategories();
         queryCategory();
         initListeners();
     }
@@ -81,6 +85,118 @@ public class SetupCategory extends AppCompatActivity {
                 showAddUpdateBudgetDialog(view, CATEGORY_ADD, null);
             }
         });
+    }
+
+    private void setupDefaultCategories() {
+        final Date currentDate = dateTimeUtils.getCurrentDatetime();
+
+        setupCategoryRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    final String[] expenseCategoryList = getResources().getStringArray(R.array.expense_category);
+                    for (int ex = 0; ex < expenseCategoryList.length; ex++) {
+                        // Check if expense category already exist
+                        final CategorySetup category = setupCategoryRealm.where(CategorySetup.class)
+                                .equalTo(CategorySetup.CATEGORY_NAME, expenseCategoryList[ex])
+                                .findFirst();
+                        if (category == null) {
+                            // Create object for Category
+                            final CategorySetup newCategory = new CategorySetup();
+                            newCategory.setCategoryId(UUID.randomUUID().toString());
+                            newCategory.setCategoryName(expenseCategoryList[ex]);
+                            newCategory.setCreatedDatetime(currentDate);
+                            newCategory.setEditable(false);
+                            newCategory.setDeletable(false);
+
+                            // Setup Category's Sub-Categories
+                            final String[] subCategories = getSubcategoryList(expenseCategoryList[ex]);
+                            if (subCategories != null) {
+                                RealmList<SubCategorySetup> foodSubcategoriesList = new RealmList<>();
+                                for (int i = 0; i < subCategories.length; i++) {
+                                    final String subCategory = subCategories[i];
+                                    Log.e("Array", "Food #" + i + " : " + subCategory);
+                                    final SubCategorySetup newSubCategorySetup = new SubCategorySetup();
+                                    newSubCategorySetup.setSubCategoryId(UUID.randomUUID().toString());
+                                    newSubCategorySetup.setSubCategoryName(subCategory);
+                                    newSubCategorySetup.setCreatedDatetime(currentDate);
+                                    newSubCategorySetup.setEditable(false);
+                                    newSubCategorySetup.setDeletable(false);
+                                    newSubCategorySetup.setShown(true);
+                                }
+                                newCategory.setSubCategoryList(foodSubcategoriesList);
+                            }
+
+                            realm.insert(newCategory);
+                        }
+                    }
+                } catch (RealmException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                }
+            }
+        });
+    }
+
+    private String[] getSubcategoryList(String category) {
+        if (category.equalsIgnoreCase(Constants.FOOD)) {
+            return getResources().getStringArray(R.array.food);
+        }
+        if (category.equalsIgnoreCase(Constants.TAXES)) {
+            return getResources().getStringArray(R.array.taxes);
+        }
+        if (category.equalsIgnoreCase(Constants.TRANSPORTATION)) {
+            return getResources().getStringArray(R.array.transportation);
+        }
+        if (category.equalsIgnoreCase(Constants.HOUSING)) {
+            return getResources().getStringArray(R.array.housing);
+        }
+        if (category.equalsIgnoreCase(Constants.HEALTH_CARE)) {
+            return getResources().getStringArray(R.array.health_care);
+        }
+        if (category.equalsIgnoreCase(Constants.SAVINGS)) {
+            return getResources().getStringArray(R.array.savings);
+        }
+        if (category.equalsIgnoreCase(Constants.INSURANCE)) {
+            return getResources().getStringArray(R.array.insurance);
+        }
+        if (category.equalsIgnoreCase(Constants.SERVICES_MEMBERSHIP)) {
+            return getResources().getStringArray(R.array.services_membership);
+        }
+        if (category.equalsIgnoreCase(Constants.CHILD_EXPENSE)) {
+            return getResources().getStringArray(R.array.child_expenses);
+        }
+        if (category.equalsIgnoreCase(Constants.HOME_SUPPLIES)) {
+            return getResources().getStringArray(R.array.home_supplies);
+        }
+        if (category.equalsIgnoreCase(Constants.UTILITIES)) {
+            return getResources().getStringArray(R.array.utilities);
+        }
+        if (category.equalsIgnoreCase(Constants.PERSONAL_CARE)) {
+            return getResources().getStringArray(R.array.personal_care);
+        }
+        if (category.equalsIgnoreCase(Constants.FUN)) {
+            return getResources().getStringArray(R.array.fun);
+        }
+        if (category.equalsIgnoreCase(Constants.PETS)) {
+            return getResources().getStringArray(R.array.pets);
+        }
+        if (category.equalsIgnoreCase(Constants.CLOTHES)) {
+            return getResources().getStringArray(R.array.clothes);
+        }
+        if (category.equalsIgnoreCase(Constants.CONSUMER_DEBT)) {
+            return getResources().getStringArray(R.array.consumer_debt);
+        }
+        if (category.equalsIgnoreCase(Constants.GIVING)) {
+            return getResources().getStringArray(R.array.giving);
+        }
+        if (category.equalsIgnoreCase(Constants.MISCELLANEOUS)) {
+            return getResources().getStringArray(R.array.miscellaneous);
+        }
+        return null;
     }
 
     private void queryCategory() {

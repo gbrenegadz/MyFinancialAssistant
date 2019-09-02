@@ -2,6 +2,7 @@ package com.gbrenegadzdev.financeassistant.models.realm;
 
 import java.util.Date;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
 public class CategorySetup extends RealmObject {
@@ -10,12 +11,14 @@ public class CategorySetup extends RealmObject {
     public static final String CREATED_DATETIME = "createdDatetime";
     public static final String IS_EDITABLE = "isEditable";
     public static final String IS_DELETABLE = "isDeletable";
+    public static final String SUB_CATEGORY_LIST = "subCategoryList";
 
     private String categoryId;
     private String categoryName;
     private Date createdDatetime;
     private boolean isEditable;
     private boolean isDeletable;
+    private RealmList<SubCategorySetup> subCategoryList;
 
     public String getCategoryId() {
         return categoryId;
@@ -57,6 +60,14 @@ public class CategorySetup extends RealmObject {
         isDeletable = deletable;
     }
 
+    public RealmList<SubCategorySetup> getSubCategoryList() {
+        return subCategoryList;
+    }
+
+    public void setSubCategoryList(RealmList<SubCategorySetup> subCategoryList) {
+        this.subCategoryList = subCategoryList;
+    }
+
     @Override
     public String toString() {
         return "CategorySetup{" +
@@ -65,6 +76,7 @@ public class CategorySetup extends RealmObject {
                 ", createdDatetime=" + createdDatetime +
                 ", isEditable=" + isEditable +
                 ", isDeletable=" + isDeletable +
+                ", \n\tsubCategoryList=" + subCategoryList.toString() +
                 '}';
     }
 }

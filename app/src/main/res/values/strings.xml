@@ -80,4 +80,229 @@
     <!--<string name="attachment_summary_on">Automatically download attachments for incoming emails-->
     <!--</string>-->
     <!--<string name="attachment_summary_off">Only download attachments when manually requested</string>-->
+
+
+    <!--===============================================================================================-->
+    <!--===============================================================================================-->
+    <!--====================                E  X  P  E  N  S  E  S                 ====================-->
+    <!--===============================================================================================-->
+    <!--===============================================================================================-->
+
+    <string-array name="food">
+        <item>Groceries</item>
+        <item>Restaurants</item>
+        <item>Fast Food</item>
+        <item>Work Meals</item>
+        <item>Meal Service</item>
+        <item>Children’s hot school lunches</item>
+        <item>Coffee Shops</item>
+        <item>Alcohol</item>
+    </string-array>
+
+    <string-array name="taxes">
+        <item>Federal Income</item>
+        <item>State</item>
+        <item>Property</item>
+        <item>Business</item>
+        <item>Accountant Fees</item>
+        <item>Filing Fees</item>
+    </string-array>
+
+    <string-array name="transportation">
+        <item>Auto loan</item>
+        <item>Registration</item>
+        <item>Gas</item>
+        <item>Road/Bridge toll</item>
+        <item>Auto maintenance</item>
+        <item>Tires</item>
+        <item>Larger service (brakes, fluids, etc.)</item>
+        <item>Auto repair (estimate based on make/model/year of car)</item>
+        <item>Public transportation</item>
+        <item>Parking</item>
+        <item>Roadside assistance (onstar)</item>
+        <item>Other forms of transportation and associated maintenance (bike, motorcycle, recreation vehicles)</item>
+    </string-array>
+
+    <string-array name="housing">
+        <item>Mortgage</item>
+        <item>Rent</item>
+        <item>Home insurance</item>
+        <item>Property tax</item>
+        <item>HOA</item>
+        <item>Home Maintenance</item>
+        <item>Home Improvement</item>
+        <item>Home Security</item>
+    </string-array>
+
+    <string-array name="health_care">
+        <item>Copays</item>
+        <item>Doctor’s office visits</item>
+        <item>Specialty care</item>
+        <item>Mental health visits</item>
+        <item>Dental care</item>
+        <item>Vision care</item>
+        <item>Prescriptions</item>
+        <item>Over the counter medications</item>
+        <item>Vitamins/ supplements</item>
+    </string-array>
+
+    <string-array name="savings">
+        <item>Emergency fund</item>
+        <item>Investing fund</item>
+        <item>Home fund (down payment, improvements, large repairs)</item>
+        <item>College savings</item>
+        <item>Fun savings</item>
+        <item>Gift savings</item>
+    </string-array>
+
+    <string-array name="insurance">
+        <item>Medical</item>
+        <item>Dental</item>
+        <item>Vision</item>
+        <item>Health Savings Account (HSA)</item>
+        <item>Flexible Spending Account (FSA) for health or childcare</item>
+        <item>Home</item>
+        <item>Private mortgage insurance</item>
+        <item>Personal property (valuables)</item>
+        <item>Renters</item>
+        <item>Pet</item>
+        <item>Auto</item>
+        <item>Life</item>
+        <item>Disability</item>
+        <item>Long-term care</item>
+    </string-array>
+
+    <string-array name="services_membership">
+        <item>Yard care</item>
+        <item>House cleaning service</item>
+        <item>Meal delivery services</item>
+        <item>Gym</item>
+        <item>Magazines</item>
+        <item>Professional society dues</item>
+        <item>Music (spotify/pandora etc.)</item>
+        <item>TV streaming services (HULU, Netflix, etc.)</item>
+        <item>Amazon Prime</item>
+        <item>Costco</item>
+        <item>Software subscriptions</item>
+        <item>Identity theft</item>
+    </string-array>
+
+    <string-array name="child_expenses">
+        <item>Childcare</item>
+        <item>School tuition</item>
+        <item>After school activities</item>
+        <item>Sports</item>
+        <item>Sports - Gear and clothing</item>
+        <item>Sports - Sign up</item>
+        <item>Sports - Travel</item>
+        <item>Summer camps</item>
+        <item>Toys</item>
+        <item>Allowance</item>
+        <item>Diapers/bottles/etc.</item>
+        <item>School supplies</item>
+        <item>Child support</item>
+    </string-array>
+
+    <string-array name="home_supplies">
+        <item>Cleaning supplies</item>
+        <item>General household supplies</item>
+        <item>Office products</item>
+        <item>Furniture</item>
+        <item>Bedding/decor</item>
+        <item>Pool/yard care</item>
+        <item>Tools</item>
+    </string-array>
+
+    <string-array name="utilities">
+        <item>Electric</item>
+        <item>Gas</item>
+        <item>Phone</item>
+        <item>Cable</item>
+        <item>Internet</item>
+        <item>Water</item>
+        <item>Sewer</item>
+        <item>Trash</item>
+        <item>Recycling</item>
+        <item>Yard waste</item>
+    </string-array>
+
+    <string-array name="personal_care">
+        <item>Haircuts</item>
+        <item>Hair color</item>
+        <item>Nail salon</item>
+        <item>Massage/Spa</item>
+        <item>Beauty products</item>
+        <item>Acupuncture</item>
+    </string-array>
+
+    <string-array name="fun">
+        <item>Going out</item>
+        <item>Events</item>
+        <item>Travel</item>
+        <item>Hobbies</item>
+        <item>Hosting/entertaining</item>
+        <item>Books</item>
+        <item>New technology</item>
+    </string-array>
+
+    <string-array name="pets">
+        <item>Food</item>
+        <item>Veterinary care</item>
+        <item>Medications</item>
+        <item>Bedding</item>
+        <item>Toys</item>
+        <item>Daycare</item>
+        <item>Pet sitter/dog walking</item>
+    </string-array>
+
+    <string-array name="clothes">
+        <item>New clothes</item>
+        <item>School clothes</item>
+        <item>Professional clothes</item>
+        <item>Uniform</item>
+        <item>Dry cleaning</item>
+    </string-array>
+
+    <string-array name="consumer_debt">
+        <item>Interest payments</item>
+        <item>Additional payments beyond minimum due</item>
+    </string-array>
+
+    <string-array name="giving">
+        <item>Charities</item>
+        <item>Church</item>
+        <item>Political</item>
+    </string-array>
+
+    <string-array name="miscellaneous">
+        <item>Anything that doesn’t quite fit into any category</item>
+        <item>Unusual, non-recurring expenses</item>
+    </string-array>
+
+    <string-array name="expense_category">
+        <item>Food</item>
+        <item>Taxes</item>
+        <item>Transportation</item>
+        <item>Housing</item>
+        <item>Health Care</item>
+        <item>Savings</item>
+        <item>Insurance</item>
+        <item>Services/Membership</item>
+        <item>Child Expenses</item>
+        <item>Home Supplies</item>
+        <item>Utilities</item>
+        <item>Personal Care</item>
+        <item>Fun</item>
+        <item>Pets</item>
+        <item>Clothes</item>
+        <item>Consumer Debt</item>
+        <item>Giving</item>
+        <item>Miscellaneous</item>
+    </string-array>
+
+    <!--===============================================================================================-->
+    <!--===============================================================================================-->
+    <!--====================                E  X  P  E  N  S  E  S                 ====================-->
+    <!--===============================================================================================-->
+    <!--===============================================================================================-->
 </resources>

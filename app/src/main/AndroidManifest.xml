@@ -17,7 +17,7 @@
         <activity
             android:name=".activities.SetupCategory"
             android:label="@string/setup_category"
-            android:parentActivityName=".activities.SettingsActivity">
+            android:parentActivityName=".activities.SettingsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gbrenegadzdev.financeassistant.activities.SettingsActivity" />

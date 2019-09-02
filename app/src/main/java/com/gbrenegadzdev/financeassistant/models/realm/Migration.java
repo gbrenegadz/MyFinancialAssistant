@@ -48,6 +48,16 @@ public class Migration implements RealmMigration {
                 categorySetupSchema.addField(CategorySetup.IS_EDITABLE, boolean.class);
                 categorySetupSchema.addField(CategorySetup.IS_DELETABLE, boolean.class);
             }
+
+            RealmObjectSchema subCategorySetupSchema = schema.get(SubCategorySetup.class.getSimpleName());
+            if (subCategorySetupSchema != null) {
+                subCategorySetupSchema.addField(SubCategorySetup.SUB_CATEGORY_ID, String.class);
+                subCategorySetupSchema.addField(SubCategorySetup.SUB_CATEGORY_NAME, String.class);
+                subCategorySetupSchema.addField(SubCategorySetup.CREATED_DATETIME, Date.class);
+                subCategorySetupSchema.addField(SubCategorySetup.IS_EDITABLE, boolean.class);
+                subCategorySetupSchema.addField(SubCategorySetup.IS_DELETABLE, boolean.class);
+                subCategorySetupSchema.addField(SubCategorySetup.IS_SHOWN, boolean.class);
+            }
         }
     }
 }
