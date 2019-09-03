@@ -73,6 +73,8 @@
     <string name="delete_category_question">Delete Category?</string>
     <string name="category_deleted">Category deleted</string>
     <string name="new_category">New Category</string>
+    <string name="failed_to_save">Failed to save</string>
+    <string name="invalid_input">Invalid input</string>
 
     <!-- Sync Preferences -->
     <!--<string name="sync_title">Sync email periodically</string>-->

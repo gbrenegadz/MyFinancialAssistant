@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
@@ -149,7 +150,7 @@ public class SetupSalaryDeductionActivity extends AppCompatActivity {
     private void showAddUpdateBudgetDialog(final View view, final int action, RealmObject realmObject) {
         LayoutInflater inflater = getLayoutInflater();
         View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_add_label_and_value, null);
-        final TextInputEditText mName = mAlertDialogCustomerView.findViewById(R.id.et_name);
+        final AutoCompleteTextView mName = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 
         mValue.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);

@@ -2,7 +2,21 @@ package com.gbrenegadzdev.financeassistant.activities;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.gbrenegadzdev.financeassistant.R;
 import com.gbrenegadzdev.financeassistant.adapters.BudgetRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Budget;
@@ -11,24 +25,6 @@ import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.text.InputType;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-
-import com.gbrenegadzdev.financeassistant.R;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Date;
@@ -135,6 +131,7 @@ public class BudgetActivity extends AppCompatActivity {
             autoCompleteCategories = new String[categorySetupRealmResults.size()];
             for (CategorySetup categorySetup : categorySetupRealmResults) {
                 autoCompleteCategories[counter] = categorySetup.getCategoryName();
+                counter++;
             }
         }
     }
@@ -167,7 +164,6 @@ public class BudgetActivity extends AppCompatActivity {
     private void showAddUpdateBudgetDialog(final View view, final int action, RealmObject realmObject) {
         LayoutInflater inflater = getLayoutInflater();
         View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_add_label_and_value, null);
-        final TextInputEditText mName = mAlertDialogCustomerView.findViewById(R.id.et_name);
         final AppCompatAutoCompleteTextView mNameAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 
@@ -175,11 +171,10 @@ public class BudgetActivity extends AppCompatActivity {
         Log.d(TAG, "autoCompleteCategories : " + autoCompleteCategories.length);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.select_dialog_item, autoCompleteCategories);
+                (this, android.R.layout.simple_list_item_1, autoCompleteCategories);
         mNameAutoComplete.setThreshold(1); //will start working from first character
         mNameAutoComplete.setAdapter(adapter);
 
-        mName.setVisibility(View.GONE);
         mValue.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         // Check if action is for Updating
@@ -187,7 +182,7 @@ public class BudgetActivity extends AppCompatActivity {
         final Budget selectedBudget = (Budget) realmObject;
         if (selectedBudget != null) {
             if (action == BUDGET_UPDATE) {
-                mName.setText(selectedBudget.getBudgetName());
+                mNameAutoComplete.setText(selectedBudget.getBudgetName());
                 mValue.setText(stringUtils.getDecimal2(selectedBudget.getAmount()));
             }
         }
@@ -198,98 +193,7 @@ public class BudgetActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialogInterface, int i) {
-                        String name = "";
-                        String value = "";
-
-                        if (mName.getText() != null) {
-                            name = mName.getText().toString();
-                            if (TextUtils.isEmpty(name)) {
-                                mName.setError(getString(R.string.required));
-                                return;
-                            }
-                        }
-
-                        if (mValue.getText() != null) {
-                            value = mValue.getText().toString();
-                            if (TextUtils.isEmpty(value)) {
-                                mValue.setError(getString(R.string.required));
-                                return;
-                            }
-                        }
-
-                        final String finalName = name;
-                        final String finalValue = value;
-                        budgetRealm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                try {
-                                    if (action == BUDGET_ADD) {
-                                        // Check if name already exist
-                                        final Budget searchBudget = realm.where(Budget.class)
-                                                .equalTo(Budget.BUDGET_NAME, finalName, Case.INSENSITIVE)
-                                                .findFirst();
-                                        if (searchBudget != null) {
-                                            snackbarUtils.createIndefinite(view, getString(R.string.budget_already_exist),
-                                                    getString(R.string.close), new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            dialogInterface.dismiss();
-                                                        }
-                                                    }).show();
-                                            return;
-                                        }
-
-
-                                        final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
-                                        final Budget newBudget = new Budget();
-                                        newBudget.setBudgetId(UUID.randomUUID().toString());
-                                        newBudget.setBudgetName(finalName);
-                                        newBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                                        newBudget.setCategory("");
-                                        newBudget.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
-                                        newBudget.setYear(dateTimeUtils.getIntYear(currentDatetime));
-                                        newBudget.setCreatedDatetime(currentDatetime);
-                                        newBudget.setModifiedDatetime(currentDatetime);
-
-                                        realm.insert(newBudget);
-
-                                        // Show Snackbar notification
-                                        snackbarUtils.create(view,
-                                                getString(R.string.budget_added).concat(" \"").concat(newBudget.getBudgetName()).concat("\""),
-                                                new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        dialogInterface.dismiss();
-                                                    }
-                                                }).show();
-                                    } else if (action == BUDGET_UPDATE) {
-                                        selectedBudget.setBudgetName(finalName);
-                                        selectedBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                                        realm.insertOrUpdate(selectedBudget);
-
-
-                                        // Show Snackbar notification
-                                        snackbarUtils.create(view,
-                                                getString(R.string.budget_updated).concat(" \"").concat(selectedBudget.getBudgetName()).concat("\""),
-                                                new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View view) {
-
-                                                    }
-                                                }).show();
-                                    }
-                                } catch (RealmException e) {
-                                    e.printStackTrace();
-                                    Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-                                }
-                            }
-                        });
-
-                        mAdapter.notifyDataSetChanged();
-                        dialogInterface.dismiss();
+                        saveNewBudget(view, mNameAutoComplete, mValue, action, dialogInterface, selectedBudget);
                     }
                 },
                 new DialogInterface.OnClickListener() {
@@ -300,6 +204,142 @@ public class BudgetActivity extends AppCompatActivity {
                 });
         if (alertDialog != null) {
             alertDialog.show();
+        }
+    }
+
+    private void saveNewBudget(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, TextInputEditText mValue, final int action, final DialogInterface dialogInterface, final Budget selectedBudget) {
+        boolean isValidatedInput = true;
+        if (mNameAutoComplete.getText() != null) {
+            Log.e(TAG, "mNameAutoComplete.getText() is not null");
+            if (TextUtils.isEmpty(mNameAutoComplete.getText().toString())) {
+                Log.e(TAG, "mNameAutoComplete.getText().toString() null");
+                mNameAutoComplete.setError(getString(R.string.required));
+                isValidatedInput = false;
+            }
+        } else {
+            Log.e(TAG, "mNameAutoComplete.getText() null");
+            mNameAutoComplete.setError(getString(R.string.required));
+            isValidatedInput = false;
+        }
+
+        if (mValue.getText() != null) {
+            Log.e(TAG, "mValue.getText() is not null");
+            if (TextUtils.isEmpty(mValue.getText().toString())) {
+                Log.e(TAG, "mValue.getText().toString() null");
+                mValue.setError(getString(R.string.required));
+                isValidatedInput = false;
+            }
+        } else {
+            Log.e(TAG, "mValue.getText() null");
+            mValue.setError(getString(R.string.required));
+            isValidatedInput = false;
+        }
+
+
+        if (isValidatedInput) {
+            final String finalName = mNameAutoComplete.getText().toString();
+            final String finalValue = mValue.getText().toString();
+            budgetRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    try {
+                        if (action == BUDGET_ADD) {
+                            // Check if name already exist
+                            final Budget searchBudget = realm.where(Budget.class)
+                                    .equalTo(Budget.BUDGET_NAME, finalName, Case.INSENSITIVE)
+                                    .findFirst();
+                            if (searchBudget != null) {
+                                snackbarUtils.createIndefinite(view, getString(R.string.budget_already_exist),
+                                        getString(R.string.close), new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        }).show();
+                                return;
+                            }
+
+
+                            final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
+                            final Budget newBudget = new Budget();
+                            newBudget.setBudgetId(UUID.randomUUID().toString());
+                            newBudget.setBudgetName(finalName);
+                            newBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
+                            newBudget.setCategory("");
+                            newBudget.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
+                            newBudget.setYear(dateTimeUtils.getIntYear(currentDatetime));
+                            newBudget.setCreatedDatetime(currentDatetime);
+                            newBudget.setModifiedDatetime(currentDatetime);
+
+                            realm.insert(newBudget);
+
+                            // Show Snackbar notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.budget_added).concat(" \"").concat(newBudget.getBudgetName()).concat("\""),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    }).show();
+                        } else if (action == BUDGET_UPDATE) {
+                            selectedBudget.setBudgetName(finalName);
+                            selectedBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
+                            realm.insertOrUpdate(selectedBudget);
+
+
+                            // Show Snackbar notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.budget_updated).concat(" \"").concat(selectedBudget.getBudgetName()).concat("\""),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                        }
+                                    }).show();
+                        }
+                    } catch (RealmException e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+
+                        // Show Snackbar error notification
+                        snackbarUtils.create(view,
+                                getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.budget_title)),
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+
+                                    }
+                                }).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+
+                        // Show Snackbar error notification
+                        snackbarUtils.create(view,
+                                getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.budget_title)),
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+
+                                    }
+                                }).show();
+                    } finally {
+                        mAdapter.notifyDataSetChanged();
+                        dialogInterface.dismiss();
+                    }
+                }
+            });
+        } else {
+            // Show Snackbar error notification
+            snackbarUtils.create(view,
+                    getString(R.string.failed_to_save).concat(". ").concat(getString(R.string.invalid_input).concat(".")),
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                        }
+                    }).show();
         }
     }
 
