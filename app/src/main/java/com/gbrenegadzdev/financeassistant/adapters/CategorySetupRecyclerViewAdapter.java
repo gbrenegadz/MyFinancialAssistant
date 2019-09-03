@@ -50,6 +50,15 @@ public class CategorySetupRecyclerViewAdapter extends RealmRecyclerViewAdapter<C
                 viewHolder.mUpdate.setVisibility(categorySetup.isEditable() ? View.VISIBLE : View.GONE);
                 viewHolder.mDelete.setVisibility(categorySetup.isDeletable() ? View.VISIBLE : View.GONE);
 
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (clickListener != null) {
+                            clickListener.onSelect(view, categorySetup);
+                        }
+                    }
+                });
+
                 viewHolder.mUpdate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

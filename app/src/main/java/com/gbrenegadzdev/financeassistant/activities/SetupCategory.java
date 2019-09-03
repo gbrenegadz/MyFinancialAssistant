@@ -110,9 +110,9 @@ public class SetupCategory extends AppCompatActivity {
                             newCategory.setDeletable(false);
 
                             // Setup Category's Sub-Categories
+                            RealmList<SubCategorySetup> foodSubcategoriesList = new RealmList<>();
                             final String[] subCategories = getSubcategoryList(expenseCategoryList[ex]);
                             if (subCategories != null) {
-                                RealmList<SubCategorySetup> foodSubcategoriesList = new RealmList<>();
                                 for (int i = 0; i < subCategories.length; i++) {
                                     final String subCategory = subCategories[i];
                                     Log.e("Array", "Food #" + i + " : " + subCategory);
@@ -123,10 +123,13 @@ public class SetupCategory extends AppCompatActivity {
                                     newSubCategorySetup.setEditable(false);
                                     newSubCategorySetup.setDeletable(false);
                                     newSubCategorySetup.setShown(true);
+                                    realm.insert(newSubCategorySetup);
+
+                                    foodSubcategoriesList.add(newSubCategorySetup);
                                 }
-                                newCategory.setSubCategoryList(foodSubcategoriesList);
                             }
 
+                            newCategory.setSubCategoryList(foodSubcategoriesList);
                             realm.insert(newCategory);
                         }
                     }
@@ -231,15 +234,20 @@ public class SetupCategory extends AppCompatActivity {
         mAdapter.setOnClickListener(new ClickListener() {
             @Override
             public void onSelect(View view, RealmObject realmObject) {
-                final SalaryDeductionSetup salaryDeductionSetup = (SalaryDeductionSetup) realmObject;
-                if (salaryDeductionSetup != null) {
-                    setupCategoryRealm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            salaryDeductionSetup.setSelected(!salaryDeductionSetup.isSelected());
-                            realm.insertOrUpdate(salaryDeductionSetup);
-                        }
-                    });
+                final CategorySetup categorySetup = (CategorySetup) realmObject;
+                String[] subCategories = new String[categorySetup.getSubCategoryList().size()];
+
+                int counter = 0;
+                for (SubCategorySetup subCategorySetup : categorySetup.getSubCategoryList()) {
+                    Log.e(TAG, "Sub Category : " + subCategorySetup.toString());
+                    subCategories[counter] = subCategorySetup.getSubCategoryName();
+                    counter++;
+                }
+
+                final AlertDialog.Builder showSubCategory = dialogUtils.showStringListDialogNoAction(SetupCategory.this,
+                        categorySetup.getCategoryName(), subCategories);
+                if (showSubCategory != null) {
+                    showSubCategory.show();
                 }
             }
 

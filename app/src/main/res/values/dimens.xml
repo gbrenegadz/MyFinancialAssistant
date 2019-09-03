@@ -28,4 +28,8 @@
     <dimen name="dp16">16dp</dimen>
     <dimen name="dp12">12dp</dimen>
     <dimen name="dp24">24dp</dimen>
+    <dimen name="dp2">2dp</dimen>
+    <dimen name="dp32">32dp</dimen>
+    <dimen name="dp1">1dp</dimen>
+    <dimen name="dp42">42dp</dimen>
 </resources>
