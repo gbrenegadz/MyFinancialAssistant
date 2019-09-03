@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.gbrenegadzdev.financeassistant.adapters.BudgetRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Budget;
+import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
@@ -14,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +24,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.gbrenegadzdev.financeassistant.R;
@@ -49,6 +53,8 @@ public class BudgetActivity extends AppCompatActivity {
     final StringUtils stringUtils = new StringUtils();
     final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
+    private String[] autoCompleteCategories;
+
     private Button mAdd;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -63,6 +69,7 @@ public class BudgetActivity extends AppCompatActivity {
 
         initUI();
         queryBudget();
+        queryCategoriesString();
         initListeners();
     }
 
@@ -120,6 +127,18 @@ public class BudgetActivity extends AppCompatActivity {
         }
     }
 
+    private void queryCategoriesString() {
+        final RealmResults<CategorySetup> categorySetupRealmResults = budgetRealm.where(CategorySetup.class)
+                .findAll();
+        if (categorySetupRealmResults != null) {
+            int counter = 0;
+            autoCompleteCategories = new String[categorySetupRealmResults.size()];
+            for (CategorySetup categorySetup : categorySetupRealmResults) {
+                autoCompleteCategories[counter] = categorySetup.getCategoryName();
+            }
+        }
+    }
+
     private void populateBudgetList(RealmResults<Budget> budgets) {
         mAdapter = new BudgetRecyclerViewAdapter(budgets, true);
         mLayoutManager = new LinearLayoutManager(this);
@@ -149,8 +168,18 @@ public class BudgetActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_add_label_and_value, null);
         final TextInputEditText mName = mAlertDialogCustomerView.findViewById(R.id.et_name);
+        final AppCompatAutoCompleteTextView mNameAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 
+
+        Log.d(TAG, "autoCompleteCategories : " + autoCompleteCategories.length);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, android.R.layout.select_dialog_item, autoCompleteCategories);
+        mNameAutoComplete.setThreshold(1); //will start working from first character
+        mNameAutoComplete.setAdapter(adapter);
+
+        mName.setVisibility(View.GONE);
         mValue.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         // Check if action is for Updating
