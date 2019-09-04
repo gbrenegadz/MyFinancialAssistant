@@ -20,7 +20,7 @@ import com.gbrenegadzdev.financeassistant.R;
 import com.gbrenegadzdev.financeassistant.adapters.BudgetRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Budget;
-import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
+import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
@@ -65,7 +65,7 @@ public class BudgetActivity extends AppCompatActivity {
 
         initUI();
         queryBudget();
-        queryCategoriesString();
+        querySubCategoriesString();
         initListeners();
     }
 
@@ -123,14 +123,15 @@ public class BudgetActivity extends AppCompatActivity {
         }
     }
 
-    private void queryCategoriesString() {
-        final RealmResults<CategorySetup> categorySetupRealmResults = budgetRealm.where(CategorySetup.class)
+    private void querySubCategoriesString() {
+        final RealmResults<SubCategorySetup> subCategorySetupRealmResults = budgetRealm.where(SubCategorySetup.class)
                 .findAll();
-        if (categorySetupRealmResults != null) {
+        if (subCategorySetupRealmResults != null) {
             int counter = 0;
-            autoCompleteCategories = new String[categorySetupRealmResults.size()];
-            for (CategorySetup categorySetup : categorySetupRealmResults) {
-                autoCompleteCategories[counter] = categorySetup.getCategoryName();
+            autoCompleteCategories = new String[subCategorySetupRealmResults.size()];
+            for (SubCategorySetup subCategorySetup : subCategorySetupRealmResults) {
+                Log.d(TAG,"Sub Category Setup : " + subCategorySetup.getSubCategoryName());
+                autoCompleteCategories[counter] = subCategorySetup.getSubCategoryName();
                 counter++;
             }
         }
@@ -265,13 +266,14 @@ public class BudgetActivity extends AppCompatActivity {
                             newBudget.setBudgetId(UUID.randomUUID().toString());
                             newBudget.setBudgetName(finalName);
                             newBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                            newBudget.setCategory("");
+                            newBudget.setCategory(stringUtils.getString(finalName, 0));
                             newBudget.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
                             newBudget.setYear(dateTimeUtils.getIntYear(currentDatetime));
                             newBudget.setCreatedDatetime(currentDatetime);
                             newBudget.setModifiedDatetime(currentDatetime);
-
                             realm.insert(newBudget);
+
+                            Log.d(TAG, "New Budget : " + newBudget.toString());
 
                             // Show Snackbar notification
                             snackbarUtils.create(view,
@@ -284,8 +286,12 @@ public class BudgetActivity extends AppCompatActivity {
                                     }).show();
                         } else if (action == BUDGET_UPDATE) {
                             selectedBudget.setBudgetName(finalName);
+                            selectedBudget.setCategory(stringUtils.getString(finalName, 0));
                             selectedBudget.setAmount(Double.parseDouble(finalValue.replace(",", "")));
+                            selectedBudget.setModifiedDatetime(dateTimeUtils.getCurrentDatetime());
                             realm.insertOrUpdate(selectedBudget);
+
+                            Log.d(TAG, "Updated Budget : " + selectedBudget.toString());
 
 
                             // Show Snackbar notification

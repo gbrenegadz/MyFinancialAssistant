@@ -70,6 +70,20 @@ public class SetupCategory extends AppCompatActivity {
         initListeners();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            setupCategoryRealm.close();
+        } catch (RealmException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused y : " + e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused y : " + e.getCause());
+        }
+    }
+
     private void setupRealm() {
         setupCategoryRealm = Realm.getDefaultInstance();
     }
@@ -90,6 +104,8 @@ public class SetupCategory extends AppCompatActivity {
 
     private void setupDefaultCategories() {
         final Date currentDate = dateTimeUtils.getCurrentDatetime();
+
+        int counter = 0;
 
         setupCategoryRealm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -119,12 +135,11 @@ public class SetupCategory extends AppCompatActivity {
                                     Log.e("Array", "Food #" + i + " : " + subCategory);
                                     final SubCategorySetup newSubCategorySetup = new SubCategorySetup();
                                     newSubCategorySetup.setSubCategoryId(UUID.randomUUID().toString());
-                                    newSubCategorySetup.setSubCategoryName(subCategory);
+                                    newSubCategorySetup.setSubCategoryName(expenseCategoryList[ex].concat(" - ").concat(subCategory));
                                     newSubCategorySetup.setCreatedDatetime(currentDate);
                                     newSubCategorySetup.setEditable(false);
                                     newSubCategorySetup.setDeletable(false);
                                     newSubCategorySetup.setShown(true);
-                                    realm.insert(newSubCategorySetup);
 
                                     foodSubcategoriesList.add(newSubCategorySetup);
                                 }
@@ -240,8 +255,8 @@ public class SetupCategory extends AppCompatActivity {
 
                 int counter = 0;
                 for (SubCategorySetup subCategorySetup : categorySetup.getSubCategoryList()) {
-                    Log.e(TAG, "Sub Category : " + subCategorySetup.toString());
-                    subCategories[counter] = subCategorySetup.getSubCategoryName();
+                    Log.e(TAG, "Sub Category : " + subCategorySetup.getSubCategoryName());
+                    subCategories[counter] = subCategorySetup.getSubCategoryName().replace(categorySetup.getCategoryName().concat(" - "), "");
                     counter++;
                 }
 

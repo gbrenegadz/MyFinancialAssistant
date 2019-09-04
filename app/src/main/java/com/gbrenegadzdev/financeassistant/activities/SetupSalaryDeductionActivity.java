@@ -72,6 +72,20 @@ public class SetupSalaryDeductionActivity extends AppCompatActivity {
         initListeners();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            setupDeductionRealm.close();
+        } catch (RealmException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused y : " + e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused y : " + e.getCause());
+        }
+    }
+
     private void setupRealm() {
         setupDeductionRealm = Realm.getDefaultInstance();
     }

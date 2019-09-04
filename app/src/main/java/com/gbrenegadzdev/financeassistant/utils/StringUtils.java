@@ -8,4 +8,9 @@ public class StringUtils {
     public String getDecimal2(double value) {
         return formatter.format(value);
     }
+
+    public String getString(String string, int index) {
+        String[] array = string.split("-", -1);
+        return array[index].trim();
+    }
 }
