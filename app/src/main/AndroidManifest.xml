@@ -15,9 +15,17 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".activities.IncomeActivity"
+            android:label="@string/income"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.gbrenegadzdev.financeassistant.MainActivity" />
+        </activity>
+        <activity
             android:name=".activities.SetupCategory"
             android:label="@string/setup_category"
-            android:parentActivityName=".activities.SettingsActivity" >
+            android:parentActivityName=".activities.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gbrenegadzdev.financeassistant.activities.SettingsActivity" />

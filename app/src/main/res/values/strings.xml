@@ -311,6 +311,7 @@
     <!--===============================================================================================-->
     <!--===============================================================================================-->
 
+
     <!--===============================================================================================-->
     <!--===============================================================================================-->
     <!--====================                   I  N  C  O  M  E                    ====================-->
@@ -318,25 +319,31 @@
     <!--===============================================================================================-->
 
     <string-array name="income_category">
-        <item>Food</item>
-        <item>Taxes</item>
-        <item>Transportation</item>
-        <item>Housing</item>
-        <item>Health Care</item>
-        <item>Savings</item>
-        <item>Insurance</item>
-        <item>Services/Membership</item>
-        <item>Child Expenses</item>
-        <item>Home Supplies</item>
-        <item>Utilities</item>
-        <item>Personal Care</item>
-        <item>Fun</item>
-        <item>Pets</item>
-        <item>Clothes</item>
-        <item>Consumer Debt</item>
-        <item>Giving</item>
-        <item>Miscellaneous</item>
+        <item>Basic Salary</item>
+        <item>Overtime</item>
+        <item>Holiday</item>
+        <item>Allowance</item>
+        <item>Bonuses</item>
+        <item>Investment Income</item>
+        <item>W2 Income</item>
+        <item>Spousal Support</item>
+        <item>Child Support</item>
+        <item>Social Security Benefits</item>
+        <item>Side Hustle Income</item>
+        <item>Reimbursed Job Expenses</item>
+        <item>Tips</item>
+        <item>Gifts</item>
     </string-array>
+    <string name="title_activity_income">IncomeActivity</string>
+    <string name="income">Income</string>
+    <string name="image">Image</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
+    <string name="income_name">Income Name</string>
+    <string name="add_income">Add Income</string>
+    <string name="slash">/</string>
+    <string name="delete_income_question">Delete Income?</string>
+    <string name="income_deleted">Income deleted</string>
 
 
     <!--===============================================================================================-->

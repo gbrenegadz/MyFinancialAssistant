@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
+import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.models.realm.Test;
 import com.google.android.material.navigation.NavigationView;
@@ -113,19 +114,8 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_dashboard) {
             // Handle the camera action
         } else if (id == R.id.nav_income) {
-            final RealmResults<Test> testRealmResults = mainActivityRealm.where(Test.class)
-                    .findAllAsync();
-            testRealmResults.isLoaded();
-            testRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Test>>() {
-                @Override
-                public void onChange(RealmResults<Test> tests, OrderedCollectionChangeSet changeSet) {
-                    if (tests.isValid()) {
-                        for (Test test : testRealmResults) {
-                            Log.d(TAG, "Test : " + test.toString());
-                        }
-                    }
-                }
-            });
+            Intent intent = new Intent(this, IncomeActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_expense) {
 
         } else if (id == R.id.nav_budget) {

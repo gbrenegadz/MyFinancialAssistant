@@ -58,6 +58,17 @@ public class Migration implements RealmMigration {
                 subCategorySetupSchema.addField(SubCategorySetup.IS_DELETABLE, boolean.class);
                 subCategorySetupSchema.addField(SubCategorySetup.IS_SHOWN, boolean.class);
             }
+
+            RealmObjectSchema incomeSchema = schema.get(Income.class.getSimpleName());
+            if (incomeSchema != null) {
+                incomeSchema.addField(Income.INCOME_ID, String.class);
+                incomeSchema.addField(Income.INCOME_NAME, String.class);
+                incomeSchema.addField(Income.AMOUNT, double.class);
+                incomeSchema.addField(Income.MONTH, String.class);
+                incomeSchema.addField(Income.YEAR, int.class);
+                incomeSchema.addField(Income.CREATED_DATETIME, Date.class);
+                incomeSchema.addField(Income.MODIFIED_DATETIME, Date.class);
+            }
         }
     }
 }
