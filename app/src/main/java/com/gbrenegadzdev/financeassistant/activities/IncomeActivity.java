@@ -154,7 +154,7 @@ public class IncomeActivity extends AppCompatActivity {
                 public void onChange(RealmResults<Income> budgets, OrderedCollectionChangeSet changeSet) {
                     if (changeSet.isCompleteResult() && budgetRealmResults.isLoaded()) {
                         if (budgets.isValid()) {
-                            populateBudgetList(budgets);
+                            populateIncomeList(budgets);
                         }
                     }
                 }
@@ -168,7 +168,7 @@ public class IncomeActivity extends AppCompatActivity {
         }
     }
 
-    private void populateBudgetList(RealmResults<Income> incomes) {
+    private void populateIncomeList(RealmResults<Income> incomes) {
         mAdapter = new IncomeRecyclerViewAdapter(incomes, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);

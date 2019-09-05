@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
+import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.models.realm.Test;
@@ -117,7 +118,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, IncomeActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_expense) {
-
+            Intent intent = new Intent(this, ExpenseActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_budget) {
             Intent intent = new Intent(this, BudgetActivity.class);
             startActivity(intent);

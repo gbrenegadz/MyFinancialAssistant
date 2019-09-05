@@ -344,6 +344,15 @@
     <string name="slash">/</string>
     <string name="delete_income_question">Delete Income?</string>
     <string name="income_deleted">Income deleted</string>
+    <string name="title_activity_expense">ExpenseActivity</string>
+    <string name="expense">Expense</string>
+    <string name="paid_to">Paid To</string>
+    <string name="expense_name">Expense Name</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="expense_added">Expense Added</string>
+    <string name="expense_updated">Expense Updated</string>
+    <string name="expense_title">Expense</string>
+    <string name="expense_deleted">Expense deleted</string>
 
 
     <!--===============================================================================================-->
