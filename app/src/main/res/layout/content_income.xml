@@ -51,7 +51,7 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/dp28"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
@@ -60,10 +60,10 @@
         android:autoSizeMinTextSize="10sp"
         android:autoSizeStepGranularity="2sp"
         android:autoSizeTextType="uniform"
+        android:gravity="end|center"
         android:text="@string/zero"
         android:textColor="@color/mti_default_primary_dark"
         android:textSize="@dimen/text_h6"
-        android:gravity="end|center"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
