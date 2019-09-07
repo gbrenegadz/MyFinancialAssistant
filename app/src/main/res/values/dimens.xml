@@ -32,4 +32,7 @@
     <dimen name="dp32">32dp</dimen>
     <dimen name="dp1">1dp</dimen>
     <dimen name="dp42">42dp</dimen>
+    <dimen name="dp26">26dp</dimen>
+    <dimen name="dp30">30dp</dimen>
+    <dimen name="dp28">28dp</dimen>
 </resources>
