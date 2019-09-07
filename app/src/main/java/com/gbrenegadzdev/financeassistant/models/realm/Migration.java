@@ -82,6 +82,13 @@ public class Migration implements RealmMigration {
                 expenseSchema.addField(Expense.CREATED_DATETIME, Date.class);
                 expenseSchema.addField(Expense.MODIFIED_DATETIME, Date.class);
             }
+
+            RealmObjectSchema paidToEntitySchema = schema.get(PaidToEntity.class.getSimpleName());
+            if (paidToEntitySchema != null) {
+                paidToEntitySchema.addField(PaidToEntity.PAID_TO_ENTITY_ID, String.class);
+                paidToEntitySchema.addField(PaidToEntity.PAID_TO_ENTITY_NAME, String.class);
+                paidToEntitySchema.addField(PaidToEntity.CREATED_DATETIME, Date.class);
+            }
         }
     }
 }

@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import com.gbrenegadzdev.financeassistant.R;
 import com.gbrenegadzdev.financeassistant.adapters.ExpenseRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Expense;
+import com.gbrenegadzdev.financeassistant.models.realm.PaidToEntity;
 import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
@@ -27,10 +30,12 @@ import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 import com.github.badoualy.datepicker.DatePickerTimeline;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 import java.util.UUID;
 
+import io.realm.Case;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
@@ -50,6 +55,7 @@ public class ExpenseActivity extends AppCompatActivity {
     final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
     private String[] autoCompleteExpense;
+    private String[] autoCompletePaidToEntities;
 
     private Button mAdd;
     private RecyclerView mRecyclerView;
@@ -66,7 +72,6 @@ public class ExpenseActivity extends AppCompatActivity {
 
         initUI();
         queryExpense();
-        querySubCategoriesString();
         initListeners();
     }
 
@@ -122,18 +127,56 @@ public class ExpenseActivity extends AppCompatActivity {
         });
     }
 
-    private void querySubCategoriesString() {
+    private void querySubCategoriesAndPaidToEntitiesString(final AppCompatAutoCompleteTextView mNameAutoComplete, final AppCompatAutoCompleteTextView mPaidTo) {
         final RealmResults<SubCategorySetup> subCategorySetupRealmResults = expenseRealm.where(SubCategorySetup.class)
-                .findAll();
-        if (subCategorySetupRealmResults != null) {
-            int counter = 0;
-            autoCompleteExpense = new String[subCategorySetupRealmResults.size()];
-            for (SubCategorySetup subCategorySetup : subCategorySetupRealmResults) {
-                Log.d(TAG, "Expense Name : " + subCategorySetup.getSubCategoryName());
-                autoCompleteExpense[counter] = subCategorySetup.getSubCategoryName();
-                counter++;
+                .findAllAsync();
+        subCategorySetupRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<SubCategorySetup>>() {
+            @Override
+            public void onChange(RealmResults<SubCategorySetup> subCategorySetups, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && subCategorySetups.isLoaded()) {
+                    if (subCategorySetups.isValid()) {
+                        int counter = 0;
+                        autoCompleteExpense = new String[subCategorySetupRealmResults.size()];
+                        for (SubCategorySetup subCategorySetup : subCategorySetupRealmResults) {
+                            Log.d(TAG, "Expense Name : " + subCategorySetup.getSubCategoryName());
+                            autoCompleteExpense[counter] = subCategorySetup.getSubCategoryName();
+                            counter++;
+                        }
+
+                        // Add Auto Complete Adapter to Expense
+                        ArrayAdapter<String> expenseAdapter = new ArrayAdapter<String>
+                                (ExpenseActivity.this, android.R.layout.simple_list_item_1, autoCompleteExpense);
+                        mNameAutoComplete.setThreshold(1); //will start working from first character
+                        mNameAutoComplete.setAdapter(expenseAdapter);
+                    }
+                }
             }
-        }
+        });
+
+        final RealmResults<PaidToEntity> paidToEntityRealmResults = expenseRealm.where(PaidToEntity.class)
+                .findAllAsync();
+        paidToEntityRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<PaidToEntity>>() {
+            @Override
+            public void onChange(RealmResults<PaidToEntity> paidToEntities, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && paidToEntities.isLoaded()) {
+                    if (paidToEntities.isValid()) {
+                        int counter = 0;
+                        autoCompletePaidToEntities = new String[paidToEntityRealmResults.size()];
+                        for (PaidToEntity paidToEntity : paidToEntityRealmResults) {
+                            Log.d(TAG, "Entity Name : " + paidToEntity.getPaidToEntityName());
+                            autoCompletePaidToEntities[counter] = paidToEntity.getPaidToEntityName();
+                            counter++;
+                        }
+
+                        // Add Auto Complete Adapter to Paid To Entity
+                        ArrayAdapter<String> entityAdapter = new ArrayAdapter<String>
+                                (ExpenseActivity.this, android.R.layout.simple_list_item_1, autoCompletePaidToEntities);
+                        mPaidTo.setThreshold(1); //will start working from first character
+                        mPaidTo.setAdapter(entityAdapter);
+                    }
+                }
+            }
+        });
     }
 
     private void queryExpense() {
@@ -188,16 +231,15 @@ public class ExpenseActivity extends AppCompatActivity {
     private void showAddUpdateExpenseDialog(final View view, final int action, RealmObject realmObject) {
         LayoutInflater inflater = getLayoutInflater();
         View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_add_label_and_value, null);
+        final TextInputLayout mPaidToCont = mAlertDialogCustomerView.findViewById(R.id.til_paid_to_auto_complete);
+        final AppCompatAutoCompleteTextView mPaidTo = mAlertDialogCustomerView.findViewById(R.id.et_paid_to_auto_complete);
         final AppCompatAutoCompleteTextView mNameAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 
+        mPaidToCont.setVisibility(View.VISIBLE);
 
-        Log.d(TAG, "autoCompleteIncome : " + autoCompleteExpense.length);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, autoCompleteExpense);
-        mNameAutoComplete.setThreshold(1); //will start working from first character
-        mNameAutoComplete.setAdapter(adapter);
+        // Get Expense and Paid To Entities for AutoComplete
+        querySubCategoriesAndPaidToEntitiesString(mNameAutoComplete, mPaidTo);
 
         mValue.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
@@ -207,6 +249,7 @@ public class ExpenseActivity extends AppCompatActivity {
         if (selectedExpense != null) {
             if (action == EXPENSE_UPDATE) {
                 mNameAutoComplete.setText(selectedExpense.getExpenseName());
+                mPaidTo.setText(selectedExpense.getPaidTo());
                 mValue.setText(stringUtils.getDecimal2(selectedExpense.getAmount()));
             }
         }
@@ -217,7 +260,7 @@ public class ExpenseActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialogInterface, int i) {
-                        saveNewBudget(view, mNameAutoComplete, mValue, action, dialogInterface, selectedExpense);
+                        saveNewBudget(view, mNameAutoComplete, mValue, mPaidTo, action, dialogInterface, selectedExpense);
                     }
                 },
                 new DialogInterface.OnClickListener() {
@@ -231,7 +274,7 @@ public class ExpenseActivity extends AppCompatActivity {
         }
     }
 
-    private void saveNewBudget(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, TextInputEditText mValue, final int action, final DialogInterface dialogInterface, final Expense selectedExpense) {
+    private void saveNewBudget(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, TextInputEditText mValue, AppCompatAutoCompleteTextView mPaidTo, final int action, final DialogInterface dialogInterface, final Expense selectedExpense) {
         boolean isValidatedInput = true;
         if (mNameAutoComplete.getText() != null) {
             Log.e(TAG, "mNameAutoComplete.getText() is not null");
@@ -262,6 +305,7 @@ public class ExpenseActivity extends AppCompatActivity {
 
         if (isValidatedInput) {
             final String finalName = mNameAutoComplete.getText().toString();
+            final String finalPaidToEntity = mPaidTo.getText().toString();
             final String finalValue = mValue.getText().toString();
             expenseRealm.executeTransaction(new Realm.Transaction() {
                 @Override
@@ -269,21 +313,22 @@ public class ExpenseActivity extends AppCompatActivity {
                     try {
                         if (action == EXPENSE_ADD) {
                             final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
-                            final Expense newIncome = new Expense();
-                            newIncome.setExpenseId(UUID.randomUUID().toString());
-                            newIncome.setExpenseName(finalName);
-                            newIncome.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                            newIncome.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
-                            newIncome.setYear(dateTimeUtils.getIntYear(currentDatetime));
-                            newIncome.setCreatedDatetime(currentDatetime);
-                            newIncome.setModifiedDatetime(currentDatetime);
-                            realm.insert(newIncome);
+                            final Expense newExpense = new Expense();
+                            newExpense.setExpenseId(UUID.randomUUID().toString());
+                            newExpense.setExpenseName(finalName);
+                            newExpense.setPaidTo(finalPaidToEntity);
+                            newExpense.setAmount(Double.parseDouble(finalValue.replace(",", "")));
+                            newExpense.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
+                            newExpense.setYear(dateTimeUtils.getIntYear(currentDatetime));
+                            newExpense.setCreatedDatetime(currentDatetime);
+                            newExpense.setModifiedDatetime(currentDatetime);
+                            realm.insert(newExpense);
 
-                            Log.d(TAG, "New Expense : " + newIncome.toString());
+                            Log.d(TAG, "New Expense : " + newExpense.toString());
 
                             // Show Snackbar notification
                             snackbarUtils.create(view,
-                                    getString(R.string.expense_added).concat(" \"").concat(newIncome.getExpenseName()).concat("\""),
+                                    getString(R.string.expense_added).concat(" \"").concat(newExpense.getExpenseName()).concat("\""),
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
@@ -292,6 +337,7 @@ public class ExpenseActivity extends AppCompatActivity {
                                     }).show();
                         } else if (action == EXPENSE_UPDATE) {
                             selectedExpense.setExpenseName(finalName);
+                            selectedExpense.setPaidTo(finalPaidToEntity);
                             selectedExpense.setAmount(Double.parseDouble(finalValue.replace(",", "")));
                             selectedExpense.setModifiedDatetime(dateTimeUtils.getCurrentDatetime());
                             realm.insertOrUpdate(selectedExpense);
@@ -308,6 +354,19 @@ public class ExpenseActivity extends AppCompatActivity {
 
                                         }
                                     }).show();
+                        }
+
+                        // Check if Paid To Entity exist
+                        // If false, save it
+                        final PaidToEntity paidToEntity = realm.where(PaidToEntity.class)
+                                .equalTo(PaidToEntity.PAID_TO_ENTITY_NAME, finalPaidToEntity, Case.INSENSITIVE)
+                                .findFirst();
+                        if (paidToEntity == null) {
+                            final PaidToEntity newPaidToEntity = new PaidToEntity();
+                            newPaidToEntity.setPaidToId(UUID.randomUUID().toString());
+                            newPaidToEntity.setPaidToEntityName(finalPaidToEntity);
+                            newPaidToEntity.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());
+                            realm.insert(newPaidToEntity);
                         }
                     } catch (RealmException e) {
                         e.printStackTrace();
