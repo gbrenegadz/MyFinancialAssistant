@@ -350,6 +350,7 @@
     <string name="menu_categories">Categories</string>
     <string name="add_sub_category">Add Sub-Category</string>
     <string name="added_new_sub_category">Added new Sub-Category</string>
+    <string name="sub_category_exist">Sub-Category already exists</string>
 
 
     <!--===============================================================================================-->

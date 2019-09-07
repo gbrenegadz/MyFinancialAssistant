@@ -315,6 +315,17 @@ public class SetupCategoryActivity extends AppCompatActivity {
                         setupCategoryRealm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
+                                // Check if Sub-Category already exist
+                                final SubCategorySetup subCategorySetup = realm.where(SubCategorySetup.class)
+                                        .equalTo(SubCategorySetup.SUB_CATEGORY_NAME, mNameAutoComplete.getText().toString(), Case.INSENSITIVE)
+                                        .findFirst();
+                                if (subCategorySetup != null) {
+                                    mNameAutoComplete.setError(getString(R.string.sub_category_exist));
+                                    mNameAutoComplete.requestFocus();
+                                    return;
+                                }
+
+
                                 final SubCategorySetup newSubCategorySetup = new SubCategorySetup();
                                 newSubCategorySetup.setSubCategoryId(UUID.randomUUID().toString());
                                 newSubCategorySetup.setSubCategoryName(mNameAutoComplete.getText().toString());
