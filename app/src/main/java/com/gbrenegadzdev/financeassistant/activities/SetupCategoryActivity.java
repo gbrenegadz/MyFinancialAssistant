@@ -7,11 +7,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -211,22 +213,20 @@ public class SetupCategoryActivity extends AppCompatActivity {
         if (category.equalsIgnoreCase(Constants.GIVING)) {
             return getResources().getStringArray(R.array.giving);
         }
-        if (category.equalsIgnoreCase(Constants.MISCELLANEOUS)) {
-            return getResources().getStringArray(R.array.miscellaneous);
-        }
         return null;
     }
 
     private void queryCategory() {
         try {
-            final RealmResults<CategorySetup> salaryDeductionSetupRealmResults = setupCategoryRealm.where(CategorySetup.class)
+            final RealmResults<CategorySetup> categorySetupRealmResults = setupCategoryRealm.where(CategorySetup.class)
                     .findAllAsync();
-            salaryDeductionSetupRealmResults.isLoaded();
-            salaryDeductionSetupRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<CategorySetup>>() {
+            categorySetupRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<CategorySetup>>() {
                 @Override
                 public void onChange(RealmResults<CategorySetup> categorySetupRealmResults, OrderedCollectionChangeSet changeSet) {
-                    if (categorySetupRealmResults.isValid()) {
-                        populateSalaryDeductionList(categorySetupRealmResults);
+                    if (changeSet.isCompleteResult() && categorySetupRealmResults.isLoaded()) {
+                        if (categorySetupRealmResults.isValid()) {
+                            populateCategoryList(categorySetupRealmResults);
+                        }
                     }
                 }
             });
@@ -239,7 +239,7 @@ public class SetupCategoryActivity extends AppCompatActivity {
         }
     }
 
-    private void populateSalaryDeductionList(RealmResults<CategorySetup> categorySetupRealmResults) {
+    private void populateCategoryList(RealmResults<CategorySetup> categorySetupRealmResults) {
         mAdapter = new CategorySetupRecyclerViewAdapter(categorySetupRealmResults, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
@@ -260,7 +260,14 @@ public class SetupCategoryActivity extends AppCompatActivity {
                 }
 
                 final AlertDialog.Builder showSubCategory = dialogUtils.showStringListDialogNoAction(SetupCategoryActivity.this,
-                        categorySetup.getCategoryName(), subCategories);
+                        categorySetup.getCategoryName(), subCategories,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                addNewSubCategory(categorySetup);
+                                dialogInterface.dismiss();
+                            }
+                        });
                 if (showSubCategory != null) {
                     showSubCategory.show();
                 }
@@ -276,6 +283,68 @@ public class SetupCategoryActivity extends AppCompatActivity {
                 showDeleteDialog(view, realmObject);
             }
         });
+    }
+
+
+    private boolean wantToCloseDialog = false;
+
+    private void addNewSubCategory(final CategorySetup categorySetup) {
+        LayoutInflater inflater = getLayoutInflater();
+        final View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_single_input, null);
+        final AppCompatAutoCompleteTextView mNameAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
+
+        final AlertDialog alertDialog = dialogUtils.showCustomDialog(SetupCategoryActivity.this, getString(R.string.add_sub_category),
+                getString(R.string.save), getString(R.string.cancel),
+                mAlertDialogCustomerView, null,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        if (alertDialog != null) {
+            alertDialog.show();
+
+            //Overriding the handler immediately after show is probably a better approach than OnShowListener as described below
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if (mNameAutoComplete.getText() != null && !TextUtils.isEmpty(mNameAutoComplete.getText().toString())) {
+                        // Save new Sub-Category
+                        setupCategoryRealm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                final SubCategorySetup newSubCategorySetup = new SubCategorySetup();
+                                newSubCategorySetup.setSubCategoryId(UUID.randomUUID().toString());
+                                newSubCategorySetup.setSubCategoryName(mNameAutoComplete.getText().toString());
+                                newSubCategorySetup.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());
+                                newSubCategorySetup.setEditable(true);
+                                newSubCategorySetup.setDeletable(true);
+                                newSubCategorySetup.setShown(true);
+
+                                RealmList<SubCategorySetup> subCategorySetupRealmList = categorySetup.getSubCategoryList();
+                                subCategorySetupRealmList.add(newSubCategorySetup);
+
+                                realm.insertOrUpdate(categorySetup);
+
+                                wantToCloseDialog = true;
+                            }
+                        });
+                    } else {
+                        mNameAutoComplete.setError(getString(R.string.invalid_input));
+                        mNameAutoComplete.requestFocus();
+                    }
+
+                    //Do stuff, possibly set wantToCloseDialog to true then...
+                    if (wantToCloseDialog) {
+                        alertDialog.dismiss();
+                        snackbarUtils.create(mRecyclerView, getString(R.string.added_new_sub_category), null).show();
+                    }
+                    //else dialog stays open. Make sure you have an obvious way to close the dialog especially if you set cancellable to false.
+                }
+            });
+        }
     }
 
     private void showAddUpdateBudgetDialog(final View view, final int action, RealmObject realmObject) {

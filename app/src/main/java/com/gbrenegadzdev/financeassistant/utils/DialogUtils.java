@@ -38,7 +38,7 @@ public class DialogUtils {
                 .create();
     }
 
-    public AlertDialog.Builder showStringListDialogNoAction(final Context context, String title, String[] stringArray) {
+    public AlertDialog.Builder showStringListDialogNoAction(final Context context, String title, String[] stringArray, DialogInterface.OnClickListener onNeutral) {
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(context);
         builderSingle.setTitle(title);
 
@@ -54,23 +54,9 @@ public class DialogUtils {
             }
         });
 
-        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String strName = arrayAdapter.getItem(which);
-                AlertDialog.Builder builderInner = new AlertDialog.Builder(context);
-                builderInner.setMessage(strName);
-                builderInner.setTitle("Your Selected Item is");
-                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog,int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builderInner.show();
-            }
-        });
-        builderSingle.show();
+        builderSingle.setNeutralButton(context.getString(R.string.add), onNeutral);
+
+        builderSingle.setAdapter(arrayAdapter, null);
 
         return builderSingle;
     }

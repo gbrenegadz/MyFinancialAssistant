@@ -279,11 +279,6 @@
         <item>Political</item>
     </string-array>
 
-    <string-array name="miscellaneous">
-        <item>Anything that doesn’t quite fit into any category</item>
-        <item>Unusual, non-recurring expenses</item>
-    </string-array>
-
     <string-array name="expense_category">
         <item>Food</item>
         <item>Taxes</item>
@@ -302,7 +297,6 @@
         <item>Clothes</item>
         <item>Consumer Debt</item>
         <item>Giving</item>
-        <item>Miscellaneous</item>
     </string-array>
 
     <!--===============================================================================================-->
@@ -354,6 +348,8 @@
     <string name="expense_title">Expense</string>
     <string name="expense_deleted">Expense deleted</string>
     <string name="menu_categories">Categories</string>
+    <string name="add_sub_category">Add Sub-Category</string>
+    <string name="added_new_sub_category">Added new Sub-Category</string>
 
 
     <!--===============================================================================================-->
