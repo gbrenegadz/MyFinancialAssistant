@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_budget) {
             Intent intent = new Intent(this, BudgetActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_categories) {
+        } else if (id == R.id.nav_category) {
             Intent intent = new Intent(this, SetupCategoryActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {

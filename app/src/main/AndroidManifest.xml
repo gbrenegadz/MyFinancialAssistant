@@ -32,7 +32,7 @@
         </activity>
         <activity
             android:name=".activities.SetupCategoryActivity"
-            android:label="@string/setup_category"
+            android:label="@string/category"
             android:parentActivityName=".activities.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

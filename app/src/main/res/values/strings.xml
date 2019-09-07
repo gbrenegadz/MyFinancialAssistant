@@ -352,6 +352,8 @@
     <string name="added_new_sub_category">Added new Sub-Category</string>
     <string name="sub_category_exist">Sub-Category already exists</string>
     <string name="million">99,999,999,999</string>
+    <string name="category">Category</string>
+    <string name="menu_category">Category</string>
 
 
     <!--===============================================================================================-->
