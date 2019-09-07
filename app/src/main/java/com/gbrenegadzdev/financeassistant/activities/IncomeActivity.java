@@ -6,20 +6,15 @@ import android.os.Bundle;
 import com.gbrenegadzdev.financeassistant.adapters.IncomeRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Income;
-import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 import com.github.badoualy.datepicker.DatePickerTimeline;
-import com.github.badoualy.datepicker.MonthView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,11 +29,9 @@ import android.widget.Button;
 import com.gbrenegadzdev.financeassistant.R;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-import io.realm.Case;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
@@ -116,7 +109,6 @@ public class IncomeActivity extends AppCompatActivity {
         });
 
 
-
         mDatePicketTimeline.setOnDateSelectedListener(new DatePickerTimeline.OnDateSelectedListener() {
             @Override
             public void onDateSelected(int year, int month, int day, int index) {
@@ -137,7 +129,7 @@ public class IncomeActivity extends AppCompatActivity {
             int counter = 0;
             autoCompleteIncome = new String[incomeStringArray.length];
             for (String incomeString : incomeStringArray) {
-                Log.d(TAG,"Income Name : " + incomeString);
+                Log.d(TAG, "Income Name : " + incomeString);
                 autoCompleteIncome[counter] = incomeString;
                 counter++;
             }
@@ -169,6 +161,11 @@ public class IncomeActivity extends AppCompatActivity {
     }
 
     private void populateIncomeList(RealmResults<Income> incomes) {
+        if (incomes != null && !incomes.isEmpty()) {
+            updateSubtitle(incomes.size());
+        }
+
+
         mAdapter = new IncomeRecyclerViewAdapter(incomes, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
@@ -191,6 +188,12 @@ public class IncomeActivity extends AppCompatActivity {
                 showDeleteDialog(view, realmObject);
             }
         });
+    }
+
+    private void updateSubtitle(int count) {
+        if (this.getSupportActionBar() != null) {
+            this.getSupportActionBar().setSubtitle(getString(R.string.count_with_colon).concat(" ").concat(String.valueOf(count)));
+        }
     }
 
     private void showAddUpdateIncomeDialog(final View view, final int action, RealmObject realmObject) {
@@ -277,7 +280,7 @@ public class IncomeActivity extends AppCompatActivity {
                     try {
                         if (action == INCOME_ADD) {
                             final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
-                            final Income newIncome= new Income();
+                            final Income newIncome = new Income();
                             newIncome.setIncomeId(UUID.randomUUID().toString());
                             newIncome.setIncomeName(finalName);
                             newIncome.setAmount(Double.parseDouble(finalValue.replace(",", "")));
@@ -345,6 +348,7 @@ public class IncomeActivity extends AppCompatActivity {
                                 }).show();
                     } finally {
                         mAdapter.notifyDataSetChanged();
+                        updateSubtitle(mAdapter.getItemCount());
                         dialogInterface.dismiss();
                     }
                 }

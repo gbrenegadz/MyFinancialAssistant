@@ -240,6 +240,10 @@ public class SetupCategoryActivity extends AppCompatActivity {
     }
 
     private void populateCategoryList(RealmResults<CategorySetup> categorySetupRealmResults) {
+        if (categorySetupRealmResults != null && !categorySetupRealmResults.isEmpty()) {
+            updateSubtitle(categorySetupRealmResults.size());
+        }
+
         mAdapter = new CategorySetupRecyclerViewAdapter(categorySetupRealmResults, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
@@ -283,6 +287,12 @@ public class SetupCategoryActivity extends AppCompatActivity {
                 showDeleteDialog(view, realmObject);
             }
         });
+    }
+
+    private void updateSubtitle(int count) {
+        if (this.getSupportActionBar() != null) {
+            this.getSupportActionBar().setSubtitle(getString(R.string.count_with_colon).concat(" ").concat(String.valueOf(count)));
+        }
     }
 
 
@@ -456,6 +466,7 @@ public class SetupCategoryActivity extends AppCompatActivity {
                         });
 
                         mAdapter.notifyDataSetChanged();
+                        updateSubtitle(mAdapter.getItemCount());
                         dialogInterface.dismiss();
                     }
                 },

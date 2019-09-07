@@ -354,6 +354,7 @@
     <string name="million">99,999,999,999</string>
     <string name="category">Category</string>
     <string name="menu_category">Category</string>
+    <string name="count_with_colon">Count :</string>
 
 
     <!--===============================================================================================-->

@@ -204,6 +204,10 @@ public class ExpenseActivity extends AppCompatActivity {
     }
 
     private void populateExpenseList(RealmResults<Expense> expenses) {
+        if (expenses != null && !expenses.isEmpty()) {
+            updateSubtitle(expenses.size());
+        }
+
         mAdapter = new ExpenseRecyclerViewAdapter(expenses, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
@@ -226,6 +230,12 @@ public class ExpenseActivity extends AppCompatActivity {
                 showDeleteDialog(view, realmObject);
             }
         });
+    }
+
+    private void updateSubtitle(int count) {
+        if (this.getSupportActionBar() != null) {
+            this.getSupportActionBar().setSubtitle(getString(R.string.count_with_colon).concat(" ").concat(String.valueOf(count)));
+        }
     }
 
     private void showAddUpdateExpenseDialog(final View view, final int action, RealmObject realmObject) {
@@ -396,6 +406,7 @@ public class ExpenseActivity extends AppCompatActivity {
                                 }).show();
                     } finally {
                         mAdapter.notifyDataSetChanged();
+                        updateSubtitle(mAdapter.getItemCount());
                         dialogInterface.dismiss();
                     }
                 }

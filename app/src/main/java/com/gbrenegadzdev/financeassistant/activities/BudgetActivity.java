@@ -130,7 +130,7 @@ public class BudgetActivity extends AppCompatActivity {
             int counter = 0;
             autoCompleteCategories = new String[subCategorySetupRealmResults.size()];
             for (SubCategorySetup subCategorySetup : subCategorySetupRealmResults) {
-                Log.d(TAG,"Sub Category Setup : " + subCategorySetup.getSubCategoryName());
+                Log.d(TAG, "Sub Category Setup : " + subCategorySetup.getSubCategoryName());
                 autoCompleteCategories[counter] = subCategorySetup.getSubCategoryName();
                 counter++;
             }
@@ -138,6 +138,10 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     private void populateBudgetList(RealmResults<Budget> budgets) {
+        if (budgets != null && !budgets.isEmpty()) {
+            updateSubtitle(budgets.size());
+        }
+
         mAdapter = new BudgetRecyclerViewAdapter(budgets, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
@@ -160,6 +164,12 @@ public class BudgetActivity extends AppCompatActivity {
                 showDeleteDialog(view, realmObject);
             }
         });
+    }
+
+    private void updateSubtitle(int count) {
+        if (this.getSupportActionBar() != null) {
+            this.getSupportActionBar().setSubtitle(getString(R.string.count_with_colon).concat(" ").concat(String.valueOf(count)));
+        }
     }
 
     private void showAddUpdateBudgetDialog(final View view, final int action, RealmObject realmObject) {
