@@ -16,15 +16,13 @@ import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
 import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
+import com.gbrenegadzdev.financeassistant.activities.SetupCategoryActivity;
 import com.gbrenegadzdev.financeassistant.models.realm.Test;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.UUID;
 
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
-import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
 public class MainActivity extends AppCompatActivity
@@ -122,6 +120,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_budget) {
             Intent intent = new Intent(this, BudgetActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_categories) {
+            Intent intent = new Intent(this, SetupCategoryActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);

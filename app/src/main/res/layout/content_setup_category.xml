@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.SetupCategory"
+    tools:context=".activities.SetupCategoryActivity"
     tools:showIn="@layout/activity_setup_category">
 
     <androidx.recyclerview.widget.RecyclerView

@@ -19,7 +19,6 @@ import com.gbrenegadzdev.financeassistant.R;
 import com.gbrenegadzdev.financeassistant.adapters.CategorySetupRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
-import com.gbrenegadzdev.financeassistant.models.realm.SalaryDeductionSetup;
 import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
@@ -40,8 +39,8 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
-public class SetupCategory extends AppCompatActivity {
-    private static final String TAG = SetupCategory.class.getSimpleName();
+public class SetupCategoryActivity extends AppCompatActivity {
+    private static final String TAG = SetupCategoryActivity.class.getSimpleName();
     private static int CATEGORY_ADD = 1;
     private static int CATEGORY_UPDATE = 2;
     private Realm setupCategoryRealm;
@@ -260,7 +259,7 @@ public class SetupCategory extends AppCompatActivity {
                     counter++;
                 }
 
-                final AlertDialog.Builder showSubCategory = dialogUtils.showStringListDialogNoAction(SetupCategory.this,
+                final AlertDialog.Builder showSubCategory = dialogUtils.showStringListDialogNoAction(SetupCategoryActivity.this,
                         categorySetup.getCategoryName(), subCategories);
                 if (showSubCategory != null) {
                     showSubCategory.show();
@@ -295,7 +294,7 @@ public class SetupCategory extends AppCompatActivity {
             mName.setText(categorySetup.getCategoryName());
         }
 
-        final AlertDialog alertDialog = dialogUtils.showCustomDialog(SetupCategory.this, getString(R.string.new_category),
+        final AlertDialog alertDialog = dialogUtils.showCustomDialog(SetupCategoryActivity.this, getString(R.string.new_category),
                 getString(R.string.save), getString(R.string.cancel),
                 mAlertDialogCustomerView,
                 new DialogInterface.OnClickListener() {

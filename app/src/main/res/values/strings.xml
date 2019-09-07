@@ -353,6 +353,7 @@
     <string name="expense_updated">Expense Updated</string>
     <string name="expense_title">Expense</string>
     <string name="expense_deleted">Expense deleted</string>
+    <string name="menu_categories">Categories</string>
 
 
     <!--===============================================================================================-->
