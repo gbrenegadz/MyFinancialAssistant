@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.gbrenegadzdev.financeassistant.R;
 import com.google.android.material.textfield.TextInputEditText;
@@ -50,12 +51,19 @@ public class IncomeActivity extends AppCompatActivity {
     final StringUtils stringUtils = new StringUtils();
     final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
+    private Date currentDate = dateTimeUtils.getCurrentDatetime();
+
     private String[] autoCompleteIncome;
+    private int selectedMonth = 0;
 
     private Button mAdd;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private DatePickerTimeline mDatePicketTimeline;
+    private TextView mTotalAmount;
+    private TextView mTotalMonth;
+    private TextView mTotalToday;
+
 
     private IncomeRecyclerViewAdapter mAdapter;
 
@@ -92,12 +100,15 @@ public class IncomeActivity extends AppCompatActivity {
     private void initUI() {
         mAdd = findViewById(R.id.btn_add);
         mRecyclerView = findViewById(R.id.recycler_view);
+        mTotalAmount = findViewById(R.id.txt_total_amount);
+        mTotalMonth = findViewById(R.id.txt_total_month);
+        mTotalToday = findViewById(R.id.txt_total_today);
 
-        Date currentDate = dateTimeUtils.getCurrentDatetime();
         mDatePicketTimeline = findViewById(R.id.date_picket_time_line);
         mDatePicketTimeline.setLastVisibleDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.setSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.centerOnSelection();
+        queryIncomeSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
     }
 
     private void initListeners() {
@@ -112,13 +123,14 @@ public class IncomeActivity extends AppCompatActivity {
         mDatePicketTimeline.setOnDateSelectedListener(new DatePickerTimeline.OnDateSelectedListener() {
             @Override
             public void onDateSelected(int year, int month, int day, int index) {
-                snackbarUtils.create(mRecyclerView, "The Date is : " + month + "/" + day + "/" + year,
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
+                // Query all income and total amount for selected date
+                queryIncomeSelectedDate(year, month, day);
 
-                            }
-                        }).show();
+                // Get Total Amount for the month
+                if (selectedMonth != month) {
+                    selectedMonth = month;
+                    queryIncomeSelectedMonth(year, month);
+                }
             }
         });
     }
@@ -138,15 +150,15 @@ public class IncomeActivity extends AppCompatActivity {
 
     private void queryIncome() {
         try {
-            final RealmResults<Income> budgetRealmResults = incomeRealm.where(Income.class)
+            final RealmResults<Income> incomeRealmResults = incomeRealm.where(Income.class)
                     .findAllAsync();
-            budgetRealmResults.isLoaded();
-            budgetRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
+            incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
                 @Override
-                public void onChange(RealmResults<Income> budgets, OrderedCollectionChangeSet changeSet) {
-                    if (changeSet.isCompleteResult() && budgetRealmResults.isLoaded()) {
-                        if (budgets.isValid()) {
-                            populateIncomeList(budgets);
+                public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
+                    if (changeSet.isCompleteResult() && incomes.isLoaded()) {
+                        if (incomes.isValid()) {
+                            updateSubtitle(incomes.size());
+                            setIncomeTotalAmount((Double) incomes.sum(Income.AMOUNT));
                         }
                     }
                 }
@@ -161,12 +173,16 @@ public class IncomeActivity extends AppCompatActivity {
     }
 
     private void populateIncomeList(RealmResults<Income> incomes) {
-        if (incomes != null && !incomes.isEmpty()) {
-            updateSubtitle(incomes.size());
+        if (incomes.isEmpty()) {
+            mAdapter = new IncomeRecyclerViewAdapter(null, true);
+            mTotalToday.setText(stringUtils.getDecimal2(0.0));
+        } else {
+            mAdapter = new IncomeRecyclerViewAdapter(incomes, true);
+            final Double selectedDateTotalAmount = (Double) incomes.sum(Income.AMOUNT);
+            Log.d(TAG, "Selected Date Amount : " + selectedDateTotalAmount);
+            mTotalToday.setText(stringUtils.getDecimal2(selectedDateTotalAmount));
         }
 
-
-        mAdapter = new IncomeRecyclerViewAdapter(incomes, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -194,6 +210,10 @@ public class IncomeActivity extends AppCompatActivity {
         if (this.getSupportActionBar() != null) {
             this.getSupportActionBar().setSubtitle(getString(R.string.count_with_colon).concat(" ").concat(String.valueOf(count)));
         }
+    }
+
+    private void setIncomeTotalAmount(double totalAmount) {
+        mTotalAmount.setText(stringUtils.getDecimal2(totalAmount));
     }
 
     private void showAddUpdateIncomeDialog(final View view, final int action, RealmObject realmObject) {
@@ -394,5 +414,53 @@ public class IncomeActivity extends AppCompatActivity {
                         }
                     }).show();
         }
+    }
+
+    private void queryIncomeSelectedDate(int year, int month, int day) {
+        Log.d(TAG, "Income Today : I'm in!!!");
+        final Date startDate = dateTimeUtils.getDate(year, month + 1, day, 0, 0, 0);
+        final Date endDate = dateTimeUtils.getDate(year, month + 1, day, 23, 59, 59);
+        Log.d(TAG, "Start Date : " + startDate + "\tEnd Date : " + endDate);
+
+        final RealmResults<Income> incomeTodayRealmResults = incomeRealm.where(Income.class)
+                .greaterThan(Income.CREATED_DATETIME, startDate)
+                .lessThanOrEqualTo(Income.CREATED_DATETIME, endDate)
+                .findAllAsync();
+        incomeTodayRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
+            @Override
+            public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && incomes.isLoaded()) {
+                    if (incomes.isValid()) {
+                        populateIncomeList(incomes);
+                    }
+                }
+            }
+        });
+    }
+
+    private void queryIncomeSelectedMonth(int year, int month) {
+        Log.d(TAG, "Income Today : I'm in!!!");
+        final Date startDate = dateTimeUtils.getDate(year, month + 1, 1, 0, 0, 0);
+        final Date endDate = dateTimeUtils.getDate(year, month + 1, dateTimeUtils.getLastDayOfMonth(year, month), 23, 59, 59);
+        Log.d(TAG, "Start Month Date : " + startDate + "\tEnd Month Date : " + endDate);
+
+        final RealmResults<Income> incomeTodayRealmResults = incomeRealm.where(Income.class)
+                .greaterThan(Income.CREATED_DATETIME, startDate)
+                .lessThanOrEqualTo(Income.CREATED_DATETIME, endDate)
+                .findAllAsync();
+        incomeTodayRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
+            @Override
+            public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && incomes.isLoaded()) {
+                    if (incomes.isValid()) {
+                        if (incomes.isEmpty()) {
+                            mTotalMonth.setText(stringUtils.getDecimal2(0.0));
+                        } else {
+                            mTotalMonth.setText(stringUtils.getDecimal2((Double) incomes.sum(Income.AMOUNT)));
+                        }
+                    }
+                }
+            }
+        });
     }
 }
