@@ -47,8 +47,8 @@ public class CategorySetupRecyclerViewAdapter extends RealmRecyclerViewAdapter<C
             final CategorySetup categorySetup = getData().get(position);
             if (categorySetup != null) {
                 viewHolder.mDeductionName.setText(categorySetup.getCategoryName());
-                viewHolder.mUpdate.setVisibility(categorySetup.isEditable() ? View.VISIBLE : View.GONE);
-                viewHolder.mDelete.setVisibility(categorySetup.isDeletable() ? View.VISIBLE : View.GONE);
+                viewHolder.mUpdate.setVisibility(categorySetup.isEditable() ? View.VISIBLE : View.INVISIBLE);
+                viewHolder.mDelete.setVisibility(categorySetup.isDeletable() ? View.VISIBLE : View.INVISIBLE);
 
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override

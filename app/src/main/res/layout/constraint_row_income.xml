@@ -4,9 +4,9 @@
     android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:paddingTop="@dimen/dp1"
-    android:paddingBottom="@dimen/dp1"
-    android:orientation="vertical">
+    android:paddingBottom="@dimen/dp1">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
@@ -19,7 +19,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/md_light_blue_300">
+            android:background="@color/white">
 
             <ImageView
                 android:id="@+id/imageView2"
@@ -30,11 +30,12 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/white"
-                android:padding="@dimen/dp4"
                 android:contentDescription="@string/image"
+                android:padding="@dimen/dp4"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_dollar_48dp"
                 android:tint="@color/md_light_blue_300"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintCircleRadius="@dimen/dp8"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,15 +48,14 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:text="@string/income_name"
-                android:textColor="@color/white"
+                android:textColor="@color/md_grey_900"
                 android:textSize="@dimen/text_subtitle_1"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/txt_income_amount"
-                app:layout_constraintEnd_toStartOf="@+id/ibtn_update"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/ibtn_delete"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -66,15 +66,13 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="2dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/zero"
-                android:textColor="@color/white"
                 android:textSize="@dimen/text_subtitle_2"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/ibtn_update"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toStartOf="@+id/ibtn_delete"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toBottomOf="@+id/txt_income_name"
                 app:layout_constraintVertical_bias="0.0" />
@@ -84,14 +82,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/transparent"
+                android:contentDescription="@string/update"
                 android:padding="@dimen/dp8"
-                android:contentDescription="@string/delete"
+                android:tint="@color/md_red_300"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/ibtn_update"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_delete_18dp_no_padding" />
 
@@ -100,12 +97,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/transparent"
+                android:contentDescription="@string/delete"
                 android:padding="@dimen/dp8"
-                android:contentDescription="@string/update"
+                android:tint="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/ibtn_delete"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_edit_18dp_no_padding" />
         </androidx.constraintlayout.widget.ConstraintLayout>

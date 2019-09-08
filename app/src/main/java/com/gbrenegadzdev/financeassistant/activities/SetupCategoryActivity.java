@@ -39,6 +39,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import io.realm.exceptions.RealmException;
 
 public class SetupCategoryActivity extends AppCompatActivity {
@@ -257,7 +258,7 @@ public class SetupCategoryActivity extends AppCompatActivity {
                 String[] subCategories = new String[categorySetup.getSubCategoryList().size()];
 
                 int counter = 0;
-                for (SubCategorySetup subCategorySetup : categorySetup.getSubCategoryList()) {
+                for (SubCategorySetup subCategorySetup : categorySetup.getSubCategoryList().sort(SubCategorySetup.SUB_CATEGORY_NAME, Sort.ASCENDING)) {
                     Log.e(TAG, "Sub Category : " + subCategorySetup.getSubCategoryName());
                     subCategories[counter] = subCategorySetup.getSubCategoryName().replace(categorySetup.getCategoryName().concat(" - "), "");
                     counter++;

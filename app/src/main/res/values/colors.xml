@@ -7,4 +7,5 @@
     <color name="md_light_blue_300">#4fc3f7</color>
     <color name="transparent">#00000000</color>
     <color name="md_red_300">#e57373</color>
+    <color name="md_grey_900">#424242</color>
 </resources>
