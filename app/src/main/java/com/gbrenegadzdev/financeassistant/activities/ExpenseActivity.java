@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,6 +21,7 @@ import com.gbrenegadzdev.financeassistant.R;
 import com.gbrenegadzdev.financeassistant.adapters.ExpenseRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Expense;
+import com.gbrenegadzdev.financeassistant.models.realm.Income;
 import com.gbrenegadzdev.financeassistant.models.realm.PaidToEntity;
 import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
@@ -56,6 +56,10 @@ public class ExpenseActivity extends AppCompatActivity {
 
     private String[] autoCompleteExpense;
     private String[] autoCompletePaidToEntities;
+    private TextView mTotalAmount;
+    private TextView mTotalMonth;
+    private TextView mTotalToday;
+    private int selectedMonth = 0;
 
     private Button mAdd;
     private RecyclerView mRecyclerView;
@@ -95,13 +99,24 @@ public class ExpenseActivity extends AppCompatActivity {
 
     private void initUI() {
         mAdd = findViewById(R.id.btn_add);
+        mTotalAmount = findViewById(R.id.txt_total_amount);
         mRecyclerView = findViewById(R.id.recycler_view);
+        mTotalMonth = findViewById(R.id.txt_total_month);
+        mTotalToday = findViewById(R.id.txt_total_today);
 
         Date currentDate = dateTimeUtils.getCurrentDatetime();
         mDatePicketTimeline = findViewById(R.id.date_picket_time_line);
         mDatePicketTimeline.setLastVisibleDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.setSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.centerOnSelection();
+
+        // Get Total Amount for current date
+        queryExpenseSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+        // Get Total Amount for the month
+        if (selectedMonth != dateTimeUtils.getIntMonth(currentDate)) {
+            selectedMonth = dateTimeUtils.getIntMonth(currentDate);
+            queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
+        }
     }
 
     private void initListeners() {
@@ -116,13 +131,14 @@ public class ExpenseActivity extends AppCompatActivity {
         mDatePicketTimeline.setOnDateSelectedListener(new DatePickerTimeline.OnDateSelectedListener() {
             @Override
             public void onDateSelected(int year, int month, int day, int index) {
-                snackbarUtils.create(mRecyclerView, "The Date is : " + month + "/" + day + "/" + year,
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
+                // Query all income and total amount for selected date
+                queryExpenseSelectedDate(year, month, day);
 
-                            }
-                        }).show();
+                // Get Total Amount for the month
+                if (selectedMonth != month) {
+                    selectedMonth = month;
+                    queryIncomeSelectedMonth(year, month);
+                }
             }
         });
     }
@@ -189,7 +205,8 @@ public class ExpenseActivity extends AppCompatActivity {
                 public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
                     if (changeSet.isCompleteResult() && expenseRealmResults.isLoaded()) {
                         if (expenses.isValid()) {
-                            populateExpenseList(expenses);
+                            updateSubtitle(expenses.size());
+                            setExpenseTotalAmount((Double) expenses.sum(Income.AMOUNT));
                         }
                     }
                 }
@@ -204,11 +221,16 @@ public class ExpenseActivity extends AppCompatActivity {
     }
 
     private void populateExpenseList(RealmResults<Expense> expenses) {
-        if (expenses != null && !expenses.isEmpty()) {
-            updateSubtitle(expenses.size());
+        if (expenses.isEmpty()) {
+            mAdapter = new ExpenseRecyclerViewAdapter(null, true);
+            mTotalToday.setText(stringUtils.getDecimal2(0.0));
+        } else {
+            mAdapter = new ExpenseRecyclerViewAdapter(expenses, true);
+            final Double selectedDateTotalAmount = (Double) expenses.sum(Expense.AMOUNT);
+            Log.d(TAG, "Selected Date Amount : " + selectedDateTotalAmount);
+            mTotalToday.setText(stringUtils.getDecimal2(selectedDateTotalAmount));
         }
 
-        mAdapter = new ExpenseRecyclerViewAdapter(expenses, true);
         mLayoutManager = new LinearLayoutManager(this);
         ((LinearLayoutManager) mLayoutManager).setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -236,6 +258,10 @@ public class ExpenseActivity extends AppCompatActivity {
         if (this.getSupportActionBar() != null) {
             this.getSupportActionBar().setSubtitle(getString(R.string.count_with_colon).concat(" ").concat(String.valueOf(count)));
         }
+    }
+
+    private void setExpenseTotalAmount(double totalAmount) {
+        mTotalAmount.setText(stringUtils.getDecimal2(totalAmount));
     }
 
     private void showAddUpdateExpenseDialog(final View view, final int action, RealmObject realmObject) {
@@ -454,5 +480,52 @@ public class ExpenseActivity extends AppCompatActivity {
         }
     }
 
+    private void queryExpenseSelectedDate(int year, int month, int day) {
+        Log.d(TAG, "Expense Today : I'm in!!!");
+        final Date startDate = dateTimeUtils.getDate(year, month + 1, day, 0, 0, 0);
+        final Date endDate = dateTimeUtils.getDate(year, month + 1, day, 23, 59, 59);
+        Log.d(TAG, "Start Date : " + startDate + "\tEnd Date : " + endDate);
+
+        final RealmResults<Expense> expenseTodayRealmResults = expenseRealm.where(Expense.class)
+                .greaterThan(Expense.CREATED_DATETIME, startDate)
+                .lessThanOrEqualTo(Expense.CREATED_DATETIME, endDate)
+                .findAllAsync();
+        expenseTodayRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
+            @Override
+            public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && expenses.isLoaded()) {
+                    if (expenses.isValid()) {
+                        populateExpenseList(expenses);
+                    }
+                }
+            }
+        });
+    }
+
+    private void queryIncomeSelectedMonth(int year, int month) {
+        Log.d(TAG, "Expense Today : I'm in!!!");
+        final Date startDate = dateTimeUtils.getDate(year, month + 1, 1, 0, 0, 0);
+        final Date endDate = dateTimeUtils.getDate(year, month + 1, dateTimeUtils.getLastDayOfMonth(year, month), 23, 59, 59);
+        Log.d(TAG, "Start Month Date : " + startDate + "\tEnd Month Date : " + endDate);
+
+        final RealmResults<Expense> expenseTodayRealmResults = expenseRealm.where(Expense.class)
+                .greaterThan(Expense.CREATED_DATETIME, startDate)
+                .lessThanOrEqualTo(Expense.CREATED_DATETIME, endDate)
+                .findAllAsync();
+        expenseTodayRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
+            @Override
+            public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && expenses.isLoaded()) {
+                    if (expenses.isValid()) {
+                        if (expenses.isEmpty()) {
+                            mTotalMonth.setText(stringUtils.getDecimal2(0.0));
+                        } else {
+                            mTotalMonth.setText(stringUtils.getDecimal2((Double) expenses.sum(Income.AMOUNT)));
+                        }
+                    }
+                }
+            }
+        });
+    }
 
 }

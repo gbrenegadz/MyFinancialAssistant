@@ -108,7 +108,14 @@ public class IncomeActivity extends AppCompatActivity {
         mDatePicketTimeline.setLastVisibleDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.setSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.centerOnSelection();
+
+        // Get Total Amount for current date
         queryIncomeSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+        // Get Total Amount for the month
+        if (selectedMonth != dateTimeUtils.getIntMonth(currentDate)) {
+            selectedMonth = dateTimeUtils.getIntMonth(currentDate);
+            queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
+        }
     }
 
     private void initListeners() {
