@@ -38,4 +38,6 @@
     <dimen name="dp100">100dp</dimen>
     <dimen name="dp60">60dp</dimen>
     <dimen name="dp52">52dp</dimen>
+    <dimen name="dp500">500dp</dimen>
+    <dimen name="dp300">300dp</dimen>
 </resources>

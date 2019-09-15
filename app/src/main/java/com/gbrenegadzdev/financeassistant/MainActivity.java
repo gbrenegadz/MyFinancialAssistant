@@ -1,14 +1,17 @@
 package com.gbrenegadzdev.financeassistant;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -17,12 +20,29 @@ import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.activities.SetupCategoryActivity;
-import com.gbrenegadzdev.financeassistant.models.realm.Test;
+import com.gbrenegadzdev.financeassistant.models.realm.Expense;
+import com.gbrenegadzdev.financeassistant.models.realm.Income;
+import com.gbrenegadzdev.financeassistant.utils.StringUtils;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
+import io.realm.Case;
+import io.realm.OrderedCollectionChangeSet;
+import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import io.realm.exceptions.RealmException;
 
 public class MainActivity extends AppCompatActivity
@@ -30,32 +50,52 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = MainActivity.class.getSimpleName();
     private Realm mainActivityRealm;
 
+    private StringUtils stringUtils = new StringUtils();
+
+    private Toolbar toolbar;
+    private DrawerLayout drawer;
+    private TextView mTotalIncomeAmount;
+    private TextView mTotalExpenseAmount;
+    private TextView mTotalCashOnHand;
+    private HorizontalBarChart mIncomeChart;
+    private HorizontalBarChart mExpenseChart;
+
+    private double totalIncomeAmount = 0.0;
+    private double totalExpenseAmount = 0.0;
+    private double totalCashOnHand = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mainActivityRealm = Realm.getDefaultInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        initUI();
+        initListeners();
+
+        getTotalIncome();
+        getTotalExpense();
+    }
+
+    private void initUI() {
+        toolbar = findViewById(R.id.toolbar);
+        drawer = findViewById(R.id.drawer_layout);
+        mTotalIncomeAmount = findViewById(R.id.txt_total_income);
+        mTotalExpenseAmount = findViewById(R.id.txt_total_expense);
+        mTotalCashOnHand = findViewById(R.id.txt_cash_on_hand);
+        mIncomeChart = findViewById(R.id.top_income_chart);
+        mExpenseChart = findViewById(R.id.top_expense_chart);
+
+        setSupportActionBar(toolbar);
+    }
+
+    private void initListeners() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-
-        final Test test = new Test();
-        test.setTestId(UUID.randomUUID().toString());
-        test.setTestName("This is a fucking trial!!!");
-        mainActivityRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.insert(test);
-            }
-        });
     }
 
     @Override
@@ -134,5 +174,189 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void getCashOnHand() {
+        totalCashOnHand = totalIncomeAmount - totalExpenseAmount;
+        mTotalCashOnHand.setText(stringUtils.getDecimal2(totalCashOnHand));
+
+        if (totalCashOnHand < 0) {
+            mTotalCashOnHand.setTextColor(getResources().getColor(R.color.colorError));
+        }
+    }
+
+    private boolean doneQueryAllIncome = false;
+
+    private void getTotalIncome() {
+        final RealmResults<Income> incomeRealmResults = mainActivityRealm.where(Income.class)
+                .sort(Income.AMOUNT, Sort.ASCENDING)
+                .findAllAsync();
+        incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
+            @Override
+            public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && incomes.isLoaded()) {
+                    if (incomes.isValid()) {
+                        for (Income income : incomes) {
+                            Log.e(TAG, "Income : " + income.toString());
+                        }
+
+                        totalIncomeAmount = (double) incomes.sum(Income.AMOUNT);
+                        mTotalIncomeAmount.setText(stringUtils.getDecimal2(totalIncomeAmount));
+
+                        // Display Cash-on-Hand
+                        doneQueryAllIncome = true;
+                        if (doneQueryAllIncome && doneQueryAllExpenses) {
+                            getCashOnHand();
+                        }
+
+                        // Setup Income Chart
+                        setupChart(mIncomeChart);
+
+                        RealmResults<Income> distinctIncomes = incomes.where()
+                                .distinct(Income.INCOME_NAME)
+                                .findAll();
+                        if (distinctIncomes != null) {
+                            final ArrayList<String> xLabels = new ArrayList<>();
+                            for (Income distinctIncome : distinctIncomes) {
+                                Log.d(TAG, "Realm Object : " + distinctIncome.toString());
+                                xLabels.add(distinctIncome.getIncomeName());
+                            }
+                            setupXAxis(mIncomeChart, xLabels);
+                            setupYAxis(mIncomeChart);
+                            setGraphData(mIncomeChart, incomes, xLabels);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupChart(HorizontalBarChart barChart) {
+        barChart.setDrawBarShadow(false);
+        Description description = new Description();
+        description.setText("");
+        barChart.setDescription(description);
+        barChart.getLegend().setEnabled(false);
+        barChart.setPinchZoom(false);
+        barChart.setDrawValueAboveBar(false);
+    }
+
+    private void setupXAxis(HorizontalBarChart barChart, final ArrayList<String> xLabels) {
+        //Display the axis on the left (contains the labels 1*, 2* and so on)
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setDrawGridLines(false);
+        xAxis.setEnabled(true);
+        xAxis.setDrawAxisLine(false);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextSize(12);
+        xAxis.setDrawAxisLine(false);
+        xAxis.setDrawGridLines(false);
+        xAxis.setDrawLimitLinesBehindData(false);
+
+        //Set label count to 5 as we are displaying 5 star rating
+        xAxis.setLabelCount(xLabels.size());
+
+        // Now add the labels to be added on the vertical axis
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return xLabels.get((int) value);
+            }
+
+        });
+    }
+
+    private void setupYAxis(HorizontalBarChart barChart) {
+        YAxis yLeft = barChart.getAxisLeft();
+
+        //Set the minimum and maximum bar lengths as per the values that they represent
+        yLeft.setAxisMaximum((float) totalIncomeAmount);
+        yLeft.setAxisMinimum(0f);
+        yLeft.setEnabled(false);
+        yLeft.setTextSize(16);
+
+        YAxis yRight = barChart.getAxisRight();
+        yRight.setDrawAxisLine(true);
+        yRight.setDrawGridLines(true);
+        yRight.setEnabled(false);
+    }
+
+    private void setGraphData(HorizontalBarChart barChart, RealmResults<Income> incomes, ArrayList<String> xLabels) {
+        //Set bar entries and add necessary formatting
+
+        //Add a list of bar entries
+        ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
+        float counter = 0;
+        for (String string : xLabels) {
+             double yValues = (double) incomes.where().equalTo(Income.INCOME_NAME, string, Case.INSENSITIVE).findAll().sum(Income.AMOUNT);
+             entries.add(new BarEntry(counter, (float) yValues));
+             counter++;
+        }
+
+        Collections.sort(entries, new Sortbyroll());
+        BarDataSet barDataSet = new BarDataSet(entries, "Bar Data Set");
+
+        //Set the colors for bars with first color for 1*, second for 2* and so on
+        barDataSet.setColors(
+                ContextCompat.getColor(barChart.getContext(), R.color.md_red_500),
+                ContextCompat.getColor(barChart.getContext(), R.color.md_deep_orange_400),
+                ContextCompat.getColor(barChart.getContext(), R.color.md_yellow_A700),
+                ContextCompat.getColor(barChart.getContext(), R.color.md_green_700),
+                ContextCompat.getColor(barChart.getContext(), R.color.md_indigo_700));
+
+        //Set bar shadows
+        barChart.setDrawBarShadow(true);
+        barDataSet.setBarShadowColor(Color.argb(40, 150, 150, 150));
+        BarData data = new BarData(barDataSet);
+
+        //Set the bar width
+        //Note : To increase the spacing between the bars set the value of barWidth to < 1f
+        data.setBarWidth(0.9f);
+        data.setValueTextSize(16);
+        data.setValueTextColor(getResources().getColor(R.color.white));
+
+
+        //Finally set the data and refresh the graph
+        barChart.setData(data);
+        barChart.invalidate();
+        barChart.notifyDataSetChanged();
+
+        //Add animation to the graph
+        barChart.animateY(1000);
+    }
+
+    private boolean doneQueryAllExpenses = false;
+
+    private void getTotalExpense() {
+        final RealmResults<Expense> incomeRealmResults = mainActivityRealm.where(Expense.class)
+                .findAllAsync();
+        incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
+            @Override
+            public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && expenses.isLoaded()) {
+                    if (expenses.isValid()) {
+                        totalExpenseAmount = (double) expenses.sum(Expense.AMOUNT);
+                        mTotalExpenseAmount.setText(stringUtils.getDecimal2(totalExpenseAmount));
+
+                        doneQueryAllExpenses = true;
+                        if (doneQueryAllIncome && doneQueryAllExpenses) {
+                            getCashOnHand();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    class Sortbyroll implements Comparator<BarEntry>
+    {
+        // Used for sorting in ascending order of
+        // roll number
+        public int compare(BarEntry a, BarEntry b)
+        {
+            int compareInt = (int) (a.getY() - b.getY());
+            Log.d(TAG, "Compare Int : " + compareInt);
+            return compareInt;
+        }
     }
 }
