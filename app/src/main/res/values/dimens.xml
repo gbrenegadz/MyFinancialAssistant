@@ -35,4 +35,7 @@
     <dimen name="dp26">26dp</dimen>
     <dimen name="dp30">30dp</dimen>
     <dimen name="dp28">28dp</dimen>
+    <dimen name="dp100">100dp</dimen>
+    <dimen name="dp60">60dp</dimen>
+    <dimen name="dp52">52dp</dimen>
 </resources>
