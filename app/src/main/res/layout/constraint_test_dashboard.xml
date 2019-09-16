@@ -422,7 +422,7 @@
                 android:layout_marginTop="@dimen/dp8"
                 android:layout_marginEnd="@dimen/dp16"
                 android:layout_marginRight="@dimen/dp16"
-                android:layout_marginBottom="@dimen/dp16"
+                android:layout_marginBottom="@dimen/dp8"
                 app:cardCornerRadius="@dimen/dp8">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -467,8 +467,7 @@
                 android:layout_marginTop="@dimen/dp16"
                 android:layout_marginEnd="@dimen/dp16"
                 android:layout_marginRight="@dimen/dp16"
-                android:layout_marginBottom="@dimen/dp8"
-                android:visibility="gone"
+                android:layout_marginBottom="@dimen/dp24"
                 app:cardCornerRadius="@dimen/dp8">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -498,7 +497,7 @@
                     <com.github.mikephil.charting.charts.HorizontalBarChart
                         android:id="@+id/top_expense_chart"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="@dimen/dp300"
                         android:layout_marginTop="8dp"
                         app:layout_constraintTop_toBottomOf="@+id/textView40000" />
                 </androidx.constraintlayout.widget.ConstraintLayout>

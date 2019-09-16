@@ -221,9 +221,22 @@ public class MainActivity extends AppCompatActivity
                                 Log.d(TAG, "Realm Object : " + distinctIncome.toString());
                                 xLabels.add(distinctIncome.getIncomeName());
                             }
+
+                            //Add a list of bar entries
+                            //Set bar entries and add necessary formatting
+                            ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
+                            float counter = 0;
+                            for (String string : xLabels) {
+                                if (counter < 5) {
+                                    double yValues = (double) incomes.where().equalTo(Income.INCOME_NAME, string, Case.INSENSITIVE).findAll().sum(Income.AMOUNT);
+                                    entries.add(new BarEntry(counter, (float) yValues));
+                                    counter++;
+                                }
+                            }
+
                             setupXAxis(mIncomeChart, xLabels);
-                            setupYAxis(mIncomeChart);
-                            setGraphData(mIncomeChart, incomes, xLabels);
+                            setupYAxis(mIncomeChart, totalIncomeAmount);
+                            setGraphData(mIncomeChart, entries);
                         }
                     }
                 }
@@ -254,7 +267,11 @@ public class MainActivity extends AppCompatActivity
         xAxis.setDrawLimitLinesBehindData(false);
 
         //Set label count to 5 as we are displaying 5 star rating
-        xAxis.setLabelCount(xLabels.size());
+        if (xLabels.size() < 5) {
+            xAxis.setLabelCount(xLabels.size());
+        } else {
+            xAxis.setLabelCount(5);
+        }
 
         // Now add the labels to be added on the vertical axis
         xAxis.setValueFormatter(new ValueFormatter() {
@@ -266,11 +283,11 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void setupYAxis(HorizontalBarChart barChart) {
+    private void setupYAxis(HorizontalBarChart barChart, double maxValue) {
         YAxis yLeft = barChart.getAxisLeft();
 
         //Set the minimum and maximum bar lengths as per the values that they represent
-        yLeft.setAxisMaximum((float) totalIncomeAmount);
+        yLeft.setAxisMaximum((float) maxValue);
         yLeft.setAxisMinimum(0f);
         yLeft.setEnabled(false);
         yLeft.setTextSize(16);
@@ -281,18 +298,8 @@ public class MainActivity extends AppCompatActivity
         yRight.setEnabled(false);
     }
 
-    private void setGraphData(HorizontalBarChart barChart, RealmResults<Income> incomes, ArrayList<String> xLabels) {
-        //Set bar entries and add necessary formatting
-
-        //Add a list of bar entries
-        ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
-        float counter = 0;
-        for (String string : xLabels) {
-             double yValues = (double) incomes.where().equalTo(Income.INCOME_NAME, string, Case.INSENSITIVE).findAll().sum(Income.AMOUNT);
-             entries.add(new BarEntry(counter, (float) yValues));
-             counter++;
-        }
-
+    private void setGraphData(HorizontalBarChart barChart, ArrayList<BarEntry> entries) {
+        // Plot entries to chart
         Collections.sort(entries, new Sortbyroll());
         BarDataSet barDataSet = new BarDataSet(entries, "Bar Data Set");
 
