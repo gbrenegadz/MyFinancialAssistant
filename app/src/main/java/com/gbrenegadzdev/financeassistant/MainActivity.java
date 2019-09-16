@@ -121,28 +121,28 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -196,10 +196,6 @@ public class MainActivity extends AppCompatActivity
             public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
                 if (changeSet.isCompleteResult() && incomes.isLoaded()) {
                     if (incomes.isValid()) {
-                        for (Income income : incomes) {
-                            Log.e(TAG, "Income : " + income.toString());
-                        }
-
                         totalIncomeAmount = (double) incomes.sum(Income.AMOUNT);
                         mTotalIncomeAmount.setText(stringUtils.getDecimal2(totalIncomeAmount));
 
@@ -244,6 +240,79 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    private boolean doneQueryAllExpenses = false;
+
+    private void getTotalExpense() {
+        final RealmResults<Expense> incomeRealmResults = mainActivityRealm.where(Expense.class)
+                .sort(Expense.AMOUNT, Sort.ASCENDING)
+                .findAllAsync();
+        incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
+            @Override
+            public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
+                if (changeSet.isCompleteResult() && expenses.isLoaded()) {
+                    if (expenses.isValid()) {
+                        totalExpenseAmount = (double) expenses.sum(Expense.AMOUNT);
+                        mTotalExpenseAmount.setText(stringUtils.getDecimal2(totalExpenseAmount));
+
+                        doneQueryAllExpenses = true;
+                        if (doneQueryAllIncome && doneQueryAllExpenses) {
+                            getCashOnHand();
+                        }
+
+                        // Setup Income Chart
+                        setupChart(mExpenseChart);
+
+                        RealmResults<Expense> distinctExpenses = expenses.where()
+                                .distinct(Expense.EXPENSE_NAME)
+                                .findAll();
+                        if (distinctExpenses != null) {
+                            final ArrayList<String> xLabels = new ArrayList<>();
+                            for (Expense distinctExpense : distinctExpenses) {
+                                Log.d(TAG, "Realm Object : " + distinctExpense.toString());
+                                xLabels.add(distinctExpense.getExpenseName());
+                            }
+
+                            //Add a list of bar entries
+                            //Set bar entries and add necessary formatting
+                            ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
+                            float counter = 0;
+                            for (String string : xLabels) {
+                                if (counter < 5) {
+                                    double yValues = (double) expenses.where().equalTo(Expense.EXPENSE_NAME, string, Case.INSENSITIVE).findAll().sum(Expense.AMOUNT);
+                                    entries.add(new BarEntry(counter, (float) yValues));
+                                    counter++;
+                                }
+                            }
+
+                            setupXAxis(mExpenseChart, xLabels);
+                            setupYAxis(mExpenseChart, totalExpenseAmount);
+                            setGraphData(mExpenseChart, entries);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    class Sortbyroll implements Comparator<BarEntry>
+    {
+        // Used for sorting in ascending order of
+        // roll number
+        public int compare(BarEntry a, BarEntry b)
+        {
+            int compareInt = (int) (a.getY() - b.getY());
+            Log.d(TAG, "Compare Int : " + compareInt);
+            return compareInt;
+        }
+    }
+
+
+    /**
+     * ============================================================================================
+     * Start
+     * Setup and Populate Bar Chart
+     * ============================================================================================
+     */
     private void setupChart(HorizontalBarChart barChart) {
         barChart.setDrawBarShadow(false);
         Description description = new Description();
@@ -301,7 +370,7 @@ public class MainActivity extends AppCompatActivity
     private void setGraphData(HorizontalBarChart barChart, ArrayList<BarEntry> entries) {
         // Plot entries to chart
         Collections.sort(entries, new Sortbyroll());
-        BarDataSet barDataSet = new BarDataSet(entries, "Bar Data Set");
+        BarDataSet barDataSet = new BarDataSet(entries, "");
 
         //Set the colors for bars with first color for 1*, second for 2* and so on
         barDataSet.setColors(
@@ -331,39 +400,10 @@ public class MainActivity extends AppCompatActivity
         //Add animation to the graph
         barChart.animateY(1000);
     }
-
-    private boolean doneQueryAllExpenses = false;
-
-    private void getTotalExpense() {
-        final RealmResults<Expense> incomeRealmResults = mainActivityRealm.where(Expense.class)
-                .findAllAsync();
-        incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
-            @Override
-            public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
-                if (changeSet.isCompleteResult() && expenses.isLoaded()) {
-                    if (expenses.isValid()) {
-                        totalExpenseAmount = (double) expenses.sum(Expense.AMOUNT);
-                        mTotalExpenseAmount.setText(stringUtils.getDecimal2(totalExpenseAmount));
-
-                        doneQueryAllExpenses = true;
-                        if (doneQueryAllIncome && doneQueryAllExpenses) {
-                            getCashOnHand();
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    class Sortbyroll implements Comparator<BarEntry>
-    {
-        // Used for sorting in ascending order of
-        // roll number
-        public int compare(BarEntry a, BarEntry b)
-        {
-            int compareInt = (int) (a.getY() - b.getY());
-            Log.d(TAG, "Compare Int : " + compareInt);
-            return compareInt;
-        }
-    }
+    /**
+     * ============================================================================================
+     * End
+     * Setup and Populate Bar Chart
+     * ============================================================================================
+     */
 }
