@@ -14,12 +14,17 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
 import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.activities.SetupCategoryActivity;
+import com.gbrenegadzdev.financeassistant.fragments.LifetimeDashboardFragment;
 import com.gbrenegadzdev.financeassistant.models.realm.Expense;
 import com.gbrenegadzdev.financeassistant.models.realm.Income;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
@@ -32,10 +37,12 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import io.realm.Case;
 import io.realm.OrderedCollectionChangeSet;
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity
     private TextView mTotalCashOnHand;
     private HorizontalBarChart mIncomeChart;
     private HorizontalBarChart mExpenseChart;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
 
     private double totalIncomeAmount = 0.0;
     private double totalExpenseAmount = 0.0;
@@ -87,6 +96,12 @@ public class MainActivity extends AppCompatActivity
         mExpenseChart = findViewById(R.id.top_expense_chart);
 
         setSupportActionBar(toolbar);
+
+        viewPager = findViewById(R.id.viewpager_dashboard);
+        setupViewPager(viewPager);
+
+        tabLayout = findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void initListeners() {
@@ -196,7 +211,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
                 if (changeSet.isCompleteResult() && incomes.isLoaded()) {
-                    if (incomes.isValid()) {
+                    if (incomes.isValid() && !incomes.isEmpty()) {
                         totalIncomeAmount = (double) incomes.sum(Income.AMOUNT);
                         mTotalIncomeAmount.setText(stringUtils.getDecimal2(totalIncomeAmount));
 
@@ -251,7 +266,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
                 if (changeSet.isCompleteResult() && expenses.isLoaded()) {
-                    if (expenses.isValid()) {
+                    if (expenses.isValid() && !expenses.isEmpty()) {
                         totalExpenseAmount = (double) expenses.sum(Expense.AMOUNT);
                         mTotalExpenseAmount.setText(stringUtils.getDecimal2(totalExpenseAmount));
 
@@ -295,12 +310,10 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    class Sortbyroll implements Comparator<BarEntry>
-    {
+    class Sortbyroll implements Comparator<BarEntry> {
         // Used for sorting in ascending order of
         // roll number
-        public int compare(BarEntry a, BarEntry b)
-        {
+        public int compare(BarEntry a, BarEntry b) {
             int compareInt = (int) (a.getY() - b.getY());
             Log.d(TAG, "Compare Int : " + compareInt);
             return compareInt;
@@ -401,10 +414,51 @@ public class MainActivity extends AppCompatActivity
         //Add animation to the graph
         barChart.animateY(1000);
     }
+
     /**
      * ============================================================================================
      * End
      * Setup and Populate Bar Chart
      * ============================================================================================
+     *
+     * @param viewPager
      */
+
+
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new LifetimeDashboardFragment(), getString(R.string.lifetime));
+        adapter.addFragment(new LifetimeDashboardFragment(), getString(R.string.monthly));
+        adapter.addFragment(new LifetimeDashboardFragment(), getString(R.string.yearly));
+        viewPager.setAdapter(adapter);
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
 }

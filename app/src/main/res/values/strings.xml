@@ -359,6 +359,9 @@
     <string name="zero_amount">0.00</string>
     <string name="top_income">Top Income</string>
     <string name="top_expenses">Top Expenses</string>
+    <string name="lifetime">Lifetime</string>
+    <string name="monthly">Monthly</string>
+    <string name="yearly">Yearly</string>
 
 
     <!--===============================================================================================-->
