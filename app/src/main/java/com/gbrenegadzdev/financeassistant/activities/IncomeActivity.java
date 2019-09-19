@@ -53,6 +53,8 @@ public class IncomeActivity extends AppCompatActivity {
 
     private Date currentDate = dateTimeUtils.getCurrentDatetime();
 
+    private RealmResults<Income> incomeRealmResults;
+
     private String[] autoCompleteIncome;
     private int selectedMonth = 0;
 
@@ -74,7 +76,6 @@ public class IncomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_income);
 
         initUI();
-        queryIncome();
         querySubCategoriesString();
         initListeners();
     }
@@ -109,13 +110,7 @@ public class IncomeActivity extends AppCompatActivity {
         mDatePicketTimeline.setSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.centerOnSelection();
 
-        // Get Total Amount for current date
-        queryIncomeSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-        // Get Total Amount for the month
-        if (selectedMonth != dateTimeUtils.getIntMonth(currentDate)) {
-            selectedMonth = dateTimeUtils.getIntMonth(currentDate);
-            queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
-        }
+        queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
     }
 
     private void initListeners() {
@@ -130,14 +125,7 @@ public class IncomeActivity extends AppCompatActivity {
         mDatePicketTimeline.setOnDateSelectedListener(new DatePickerTimeline.OnDateSelectedListener() {
             @Override
             public void onDateSelected(int year, int month, int day, int index) {
-                // Query all income and total amount for selected date
-                queryIncomeSelectedDate(year, month, day);
-
-                // Get Total Amount for the month
-                if (selectedMonth != month) {
-                    selectedMonth = month;
-                    queryIncomeSelectedMonth(year, month);
-                }
+                queryIncomeSelectedDateAndMonth(year, month, day);
             }
         });
     }
@@ -152,30 +140,6 @@ public class IncomeActivity extends AppCompatActivity {
                 autoCompleteIncome[counter] = incomeString;
                 counter++;
             }
-        }
-    }
-
-    private void queryIncome() {
-        try {
-            final RealmResults<Income> incomeRealmResults = incomeRealm.where(Income.class)
-                    .findAllAsync();
-            incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
-                @Override
-                public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
-                    if (changeSet.isCompleteResult() && incomes.isLoaded()) {
-                        if (incomes.isValid()) {
-                            updateSubtitle(incomes.size());
-                            setIncomeTotalAmount((Double) incomes.sum(Income.AMOUNT));
-                        }
-                    }
-                }
-            });
-        } catch (RealmException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
         }
     }
 
@@ -301,7 +265,8 @@ public class IncomeActivity extends AppCompatActivity {
         if (isValidatedInput) {
             final String finalName = mNameAutoComplete.getText().toString();
             final String finalValue = mValue.getText().toString();
-            incomeRealm.executeTransaction(new Realm.Transaction() {
+
+            incomeRealm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     try {
@@ -374,9 +339,18 @@ public class IncomeActivity extends AppCompatActivity {
                                     }
                                 }).show();
                     } finally {
-                        mAdapter.notifyDataSetChanged();
-                        updateSubtitle(mAdapter.getItemCount());
-                        dialogInterface.dismiss();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mAdapter.getItemCount() == 0) {
+                                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+                                } else {
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                                updateSubtitle(mAdapter.getItemCount());
+                                dialogInterface.dismiss();
+                            }
+                        });
                     }
                 }
             });
@@ -420,6 +394,17 @@ public class IncomeActivity extends AppCompatActivity {
                             });
                         }
                     }).show();
+        }
+    }
+
+    private void queryIncomeSelectedDateAndMonth(int year, int month, int day) {
+        // Query all income and total amount for selected date
+        queryIncomeSelectedDate(year, month, day);
+
+        // Get Total Amount for the month
+        if (selectedMonth != month) {
+            selectedMonth = month;
+            queryIncomeSelectedMonth(year, month);
         }
     }
 

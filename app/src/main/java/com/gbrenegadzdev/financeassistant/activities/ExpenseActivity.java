@@ -54,6 +54,10 @@ public class ExpenseActivity extends AppCompatActivity {
     final StringUtils stringUtils = new StringUtils();
     final SnackbarUtils snackbarUtils = new SnackbarUtils();
 
+    private Date currentDate = dateTimeUtils.getCurrentDatetime();
+
+    private RealmResults<Expense> expenseRealmResults;
+
     private String[] autoCompleteExpense;
     private String[] autoCompletePaidToEntities;
     private TextView mTotalAmount;
@@ -75,7 +79,6 @@ public class ExpenseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_expense);
 
         initUI();
-        queryExpense();
         initListeners();
     }
 
@@ -104,19 +107,12 @@ public class ExpenseActivity extends AppCompatActivity {
         mTotalMonth = findViewById(R.id.txt_total_month);
         mTotalToday = findViewById(R.id.txt_total_today);
 
-        Date currentDate = dateTimeUtils.getCurrentDatetime();
         mDatePicketTimeline = findViewById(R.id.date_picket_time_line);
         mDatePicketTimeline.setLastVisibleDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.setSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
         mDatePicketTimeline.centerOnSelection();
 
-        // Get Total Amount for current date
-        queryExpenseSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-        // Get Total Amount for the month
-        if (selectedMonth != dateTimeUtils.getIntMonth(currentDate)) {
-            selectedMonth = dateTimeUtils.getIntMonth(currentDate);
-            queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
-        }
+        queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
     }
 
     private void initListeners() {
@@ -131,14 +127,7 @@ public class ExpenseActivity extends AppCompatActivity {
         mDatePicketTimeline.setOnDateSelectedListener(new DatePickerTimeline.OnDateSelectedListener() {
             @Override
             public void onDateSelected(int year, int month, int day, int index) {
-                // Query all income and total amount for selected date
-                queryExpenseSelectedDate(year, month, day);
-
-                // Get Total Amount for the month
-                if (selectedMonth != month) {
-                    selectedMonth = month;
-                    queryIncomeSelectedMonth(year, month);
-                }
+                queryIncomeSelectedDateAndMonth(year, month, day);
             }
         });
     }
@@ -193,31 +182,6 @@ public class ExpenseActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void queryExpense() {
-        try {
-            final RealmResults<Expense> expenseRealmResults = expenseRealm.where(Expense.class)
-                    .findAllAsync();
-            expenseRealmResults.isLoaded();
-            expenseRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
-                @Override
-                public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
-                    if (changeSet.isCompleteResult() && expenseRealmResults.isLoaded()) {
-                        if (expenses.isValid()) {
-                            updateSubtitle(expenses.size());
-                            setExpenseTotalAmount((Double) expenses.sum(Income.AMOUNT));
-                        }
-                    }
-                }
-            });
-        } catch (RealmException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-        }
     }
 
     private void populateExpenseList(RealmResults<Expense> expenses) {
@@ -343,7 +307,8 @@ public class ExpenseActivity extends AppCompatActivity {
             final String finalName = mNameAutoComplete.getText().toString();
             final String finalPaidToEntity = mPaidTo.getText().toString();
             final String finalValue = mValue.getText().toString();
-            expenseRealm.executeTransaction(new Realm.Transaction() {
+
+            expenseRealm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     try {
@@ -431,9 +396,18 @@ public class ExpenseActivity extends AppCompatActivity {
                                     }
                                 }).show();
                     } finally {
-                        mAdapter.notifyDataSetChanged();
-                        updateSubtitle(mAdapter.getItemCount());
-                        dialogInterface.dismiss();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mAdapter.getItemCount() == 0) {
+                                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+                                } else {
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                                updateSubtitle(mAdapter.getItemCount());
+                                dialogInterface.dismiss();
+                            }
+                        });
                     }
                 }
             });
@@ -480,6 +454,17 @@ public class ExpenseActivity extends AppCompatActivity {
         }
     }
 
+    private void queryIncomeSelectedDateAndMonth(int year, int month, int day) {
+        // Query all income and total amount for selected date
+        queryExpenseSelectedDate(year, month, day);
+
+        // Get Total Amount for the month
+        if (selectedMonth != month) {
+            selectedMonth = month;
+            queryExpenseSelectedMonth(year, month);
+        }
+    }
+
     private void queryExpenseSelectedDate(int year, int month, int day) {
         Log.d(TAG, "Expense Today : I'm in!!!");
         final Date startDate = dateTimeUtils.getDate(year, month + 1, day, 0, 0, 0);
@@ -502,7 +487,7 @@ public class ExpenseActivity extends AppCompatActivity {
         });
     }
 
-    private void queryIncomeSelectedMonth(int year, int month) {
+    private void queryExpenseSelectedMonth(int year, int month) {
         Log.d(TAG, "Expense Today : I'm in!!!");
         final Date startDate = dateTimeUtils.getDate(year, month + 1, 1, 0, 0, 0);
         final Date endDate = dateTimeUtils.getDate(year, month + 1, dateTimeUtils.getLastDayOfMonth(year, month), 23, 59, 59);
