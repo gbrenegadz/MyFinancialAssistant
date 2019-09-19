@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -22,8 +23,10 @@ import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.activities.SetupCategoryActivity;
 import com.gbrenegadzdev.financeassistant.fragments.LifetimeDashboardFragment;
+import com.gbrenegadzdev.financeassistant.fragments.MonthlyDashboardFragment;
 import com.gbrenegadzdev.financeassistant.models.realm.Expense;
 import com.gbrenegadzdev.financeassistant.models.realm.Income;
+import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -167,12 +170,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new LifetimeDashboardFragment(), getString(R.string.lifetime));
-        adapter.addFragment(new LifetimeDashboardFragment(), getString(R.string.monthly));
-        adapter.addFragment(new LifetimeDashboardFragment(), getString(R.string.yearly));
+        adapter.addFragment(new MonthlyDashboardFragment(), getString(R.string.monthly));
         viewPager.setAdapter(adapter);
     }
 

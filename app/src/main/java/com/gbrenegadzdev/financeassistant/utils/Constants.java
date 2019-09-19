@@ -20,4 +20,11 @@ public class Constants {
     public static final String CONSUMER_DEBT = "Consumer Debt";
     public static final String GIVING = "Giving";
     public static final String MISCELLANEOUS = "Miscellaneous";
+
+    public static final int REQUEST_CODE_MAIN_MENU = 0;
+    public static final int REQUEST_CODE_INCOME = 1;
+    public static final int REQUEST_CODE_EXPENSE = 2;
+    public static final int REQUEST_CODE_BUDGET = 3;
+    public static final int REQUEST_CODE_CATEGORY = 4;
+    public static final int REQUEST_CODE_SETTINGS = 5;
 }

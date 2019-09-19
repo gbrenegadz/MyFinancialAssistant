@@ -49,10 +49,10 @@
         <activity
             android:name=".activities.BudgetActivity"
             android:label="@string/title_activity_budget"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".activities.SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.gbrenegadzdev.financeassistant.MainActivity" />
+                android:value="com.gbrenegadzdev.financeassistant.activities.SettingsActivity" />
         </activity>
         <activity
             android:name=".activities.SettingsActivity"

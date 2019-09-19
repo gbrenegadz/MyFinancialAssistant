@@ -1,6 +1,8 @@
 package com.gbrenegadzdev.financeassistant.activities;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.gbrenegadzdev.financeassistant.adapters.IncomeRecyclerViewAdapter;
@@ -76,8 +78,17 @@ public class IncomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_income);
 
         initUI();
+        queryIncome();
         querySubCategoriesString();
         initListeners();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent result = new Intent();
+        setResult(Activity.RESULT_OK, result);
+        finish();
     }
 
     @Override
@@ -175,6 +186,36 @@ public class IncomeActivity extends AppCompatActivity {
                 showDeleteDialog(view, realmObject);
             }
         });
+    }
+
+
+    private void queryIncome() {
+        try {
+            incomeRealmResults = incomeRealm.where(Income.class)
+                    .findAllAsync();
+            incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
+                @Override
+                public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
+                    if (changeSet.isCompleteResult() && incomes.isLoaded()) {
+                        if (incomes.isValid()) {
+                            if (incomes.size() > 0) {
+                                updateSubtitle(incomes.size());
+                                setIncomeTotalAmount((Double) incomes.sum(Income.AMOUNT));
+                            } else {
+                                incomeRealmResults.removeAllChangeListeners();
+                                queryIncome();
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (RealmException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+        }
     }
 
     private void updateSubtitle(int count) {

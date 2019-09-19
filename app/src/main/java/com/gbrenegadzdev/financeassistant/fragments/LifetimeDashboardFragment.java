@@ -1,5 +1,6 @@
 package com.gbrenegadzdev.financeassistant.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +59,21 @@ public class LifetimeDashboardFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.constraint_test_dashboard, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initUI();
+        showTopIncome();
+        showTopExpenses();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -70,22 +86,6 @@ public class LifetimeDashboardFragment extends Fragment {
             e.printStackTrace();
             Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
         }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.constraint_test_dashboard, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        initUI();
-
-        showTopIncome();
-        showTopExpenses();
     }
 
     private void setupRealm() {
@@ -104,106 +104,92 @@ public class LifetimeDashboardFragment extends Fragment {
     private void showTopIncome() {
         final RealmResults<Income> incomeRealmResults = dashboardRealm.where(Income.class)
                 .sort(Income.AMOUNT, Sort.ASCENDING)
-                .findAllAsync();
-        incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
-            @Override
-            public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
-                if (changeSet.isCompleteResult() && incomes.isLoaded()) {
-                    if (incomes.isValid() && incomes.size() > 0) {
-                        totalIncomeAmount = (double) incomes.sum(Income.AMOUNT);
-                        mTotalIncomeAmount.setText(stringUtils.getDecimal2(totalIncomeAmount));
+                .findAll();
+        if (incomeRealmResults != null) {
+            totalIncomeAmount = (double) incomeRealmResults.sum(Income.AMOUNT);
+            mTotalIncomeAmount.setText(stringUtils.getDecimal2(totalIncomeAmount));
 
-                        // Display Cash-on-Hand
-                        doneQueryAllIncome = true;
-                        if (doneQueryAllIncome && doneQueryAllExpenses) {
-                            getCashOnHand();
-                        }
+            // Display Cash-on-Hand
+            doneQueryAllIncome = true;
+            if (doneQueryAllIncome && doneQueryAllExpenses) {
+                getCashOnHand();
+            }
 
-                        // Setup Income Chart
-                        chartUtils.setupChart(mIncomeChart);
+            // Setup Income Chart
+            chartUtils.setupChart(mIncomeChart);
 
-                        RealmResults<Income> distinctIncomes = incomes.where()
-                                .distinct(Income.INCOME_NAME)
-                                .findAll();
-                        if (distinctIncomes != null) {
-                            final ArrayList<String> xLabels = new ArrayList<>();
-                            for (Income distinctIncome : distinctIncomes) {
-                                Log.d(TAG, "Realm Object : " + distinctIncome.toString());
-                                xLabels.add(distinctIncome.getIncomeName());
-                            }
+            RealmResults<Income> distinctIncomes = incomeRealmResults.where()
+                    .distinct(Income.INCOME_NAME)
+                    .findAll();
+            if (distinctIncomes != null) {
+                final ArrayList<String> xLabels = new ArrayList<>();
+                for (Income distinctIncome : distinctIncomes) {
+                    Log.d(TAG, "Realm Object : " + distinctIncome.toString());
+                    xLabels.add(distinctIncome.getIncomeName());
+                }
 
-                            //Add a list of bar entries
-                            //Set bar entries and add necessary formatting
-                            ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
-                            float counter = 0;
-                            for (String string : xLabels) {
-                                if (counter < 5) {
-                                    double yValues = (double) incomes.where().equalTo(Income.INCOME_NAME, string, Case.INSENSITIVE).findAll().sum(Income.AMOUNT);
-                                    entries.add(new BarEntry(counter, (float) yValues));
-                                    counter++;
-                                }
-                            }
-
-                            chartUtils.setupXAxis(mIncomeChart, xLabels);
-                            chartUtils.setupYAxis(mIncomeChart, totalIncomeAmount);
-                            chartUtils.setGraphData(getContext(), mIncomeChart, entries);
-                        }
+                //Add a list of bar entries
+                //Set bar entries and add necessary formatting
+                ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
+                float counter = 0;
+                for (String string : xLabels) {
+                    if (counter < 5) {
+                        double yValues = (double) incomeRealmResults.where().equalTo(Income.INCOME_NAME, string, Case.INSENSITIVE).findAll().sum(Income.AMOUNT);
+                        entries.add(new BarEntry(counter, (float) yValues));
+                        counter++;
                     }
                 }
+
+                chartUtils.setupXAxis(mIncomeChart, xLabels);
+                chartUtils.setupYAxis(mIncomeChart, totalIncomeAmount);
+                chartUtils.setGraphData(getContext(), mIncomeChart, entries);
             }
-        });
+        }
     }
 
     private void showTopExpenses() {
         final RealmResults<Expense> incomeRealmResults = dashboardRealm.where(Expense.class)
                 .sort(Expense.AMOUNT, Sort.ASCENDING)
-                .findAllAsync();
-        incomeRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
-            @Override
-            public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
-                if (changeSet.isCompleteResult() && expenses.isLoaded()) {
-                    if (expenses.isValid() && expenses.size() > 0) {
-                        totalExpenseAmount = (double) expenses.sum(Expense.AMOUNT);
-                        mTotalExpenseAmount.setText(stringUtils.getDecimal2(totalExpenseAmount));
+                .findAll();
+        if (incomeRealmResults != null) {
+            totalExpenseAmount = (double) incomeRealmResults.sum(Expense.AMOUNT);
+            mTotalExpenseAmount.setText(stringUtils.getDecimal2(totalExpenseAmount));
 
-                        doneQueryAllExpenses = true;
-                        if (doneQueryAllIncome && doneQueryAllExpenses) {
-                            getCashOnHand();
-                        }
+            doneQueryAllExpenses = true;
+            if (doneQueryAllIncome && doneQueryAllExpenses) {
+                getCashOnHand();
+            }
 
-                        // Setup Income Chart
-                        chartUtils.setupChart(mExpenseChart);
+            // Setup Income Chart
+            chartUtils.setupChart(mExpenseChart);
 
-                        RealmResults<Expense> distinctExpenses = expenses.where()
-                                .distinct(Expense.EXPENSE_NAME)
-                                .findAll();
-                        if (distinctExpenses != null) {
-                            final ArrayList<String> xLabels = new ArrayList<>();
-                            for (Expense distinctExpense : distinctExpenses) {
-                                Log.d(TAG, "Realm Object : " + distinctExpense.toString());
-                                xLabels.add(distinctExpense.getExpenseName());
-                            }
+            RealmResults<Expense> distinctExpenses = incomeRealmResults.where()
+                    .distinct(Expense.EXPENSE_NAME)
+                    .findAll();
+            if (distinctExpenses != null) {
+                final ArrayList<String> xLabels = new ArrayList<>();
+                for (Expense distinctExpense : distinctExpenses) {
+                    Log.d(TAG, "Realm Object : " + distinctExpense.toString());
+                    xLabels.add(distinctExpense.getExpenseName());
+                }
 
-                            //Add a list of bar entries
-                            //Set bar entries and add necessary formatting
-                            ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
-                            float counter = 0;
-                            for (String string : xLabels) {
-                                if (counter < 5) {
-                                    double yValues = (double) expenses.where().equalTo(Expense.EXPENSE_NAME, string, Case.INSENSITIVE).findAll().sum(Expense.AMOUNT);
-                                    entries.add(new BarEntry(counter, (float) yValues));
-                                    counter++;
-                                }
-                            }
-
-                            chartUtils.setupXAxis(mExpenseChart, xLabels);
-                            chartUtils.setupYAxis(mExpenseChart, totalExpenseAmount);
-                            chartUtils.setGraphData(getContext(), mExpenseChart, entries);
-                        }
+                //Add a list of bar entries
+                //Set bar entries and add necessary formatting
+                ArrayList<BarEntry> entries = new ArrayList<BarEntry>();
+                float counter = 0;
+                for (String string : xLabels) {
+                    if (counter < 5) {
+                        double yValues = (double) incomeRealmResults.where().equalTo(Expense.EXPENSE_NAME, string, Case.INSENSITIVE).findAll().sum(Expense.AMOUNT);
+                        entries.add(new BarEntry(counter, (float) yValues));
+                        counter++;
                     }
                 }
+
+                chartUtils.setupXAxis(mExpenseChart, xLabels);
+                chartUtils.setupYAxis(mExpenseChart, totalExpenseAmount);
+                chartUtils.setGraphData(getContext(), mExpenseChart, entries);
             }
-        });
+        }
     }
 
     private void getCashOnHand() {

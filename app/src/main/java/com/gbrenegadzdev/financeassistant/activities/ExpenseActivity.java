@@ -79,6 +79,7 @@ public class ExpenseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_expense);
 
         initUI();
+        queryExpense();
         initListeners();
     }
 
@@ -130,6 +131,36 @@ public class ExpenseActivity extends AppCompatActivity {
                 queryIncomeSelectedDateAndMonth(year, month, day);
             }
         });
+    }
+
+
+    private void queryExpense() {
+        try {
+            expenseRealmResults = expenseRealm.where(Expense.class)
+                    .findAllAsync();
+            expenseRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Expense>>() {
+                @Override
+                public void onChange(RealmResults<Expense> expenses, OrderedCollectionChangeSet changeSet) {
+                    if (changeSet.isCompleteResult() && expenseRealmResults.isLoaded()) {
+                        if (expenses.size() > 0) {
+                            if (expenses.isValid()) {
+                                updateSubtitle(expenses.size());
+                                setExpenseTotalAmount((Double) expenses.sum(Income.AMOUNT));
+                            }
+                        } else {
+                            expenseRealmResults.removeAllChangeListeners();
+                            queryExpense();
+                        }
+                    }
+                }
+            });
+        } catch (RealmException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+        }
     }
 
     private void querySubCategoriesAndPaidToEntitiesString(final AppCompatAutoCompleteTextView mNameAutoComplete, final AppCompatAutoCompleteTextView mPaidTo) {
