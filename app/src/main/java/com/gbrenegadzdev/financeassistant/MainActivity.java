@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
+import com.gbrenegadzdev.financeassistant.activities.CombinedChartActivity;
 import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
@@ -145,6 +146,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_dashboard) {
             // Handle the camera action
+            Intent intent = new Intent(this, CombinedChartActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_income) {
             Intent intent = new Intent(this, IncomeActivity.class);
             startActivity(intent);

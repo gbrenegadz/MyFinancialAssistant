@@ -1,6 +1,5 @@
 package com.gbrenegadzdev.financeassistant.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,8 +22,6 @@ import com.github.mikephil.charting.data.BarEntry;
 import java.util.ArrayList;
 
 import io.realm.Case;
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
@@ -62,7 +59,7 @@ public class LifetimeDashboardFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.constraint_test_dashboard, container, false);
+        return inflater.inflate(R.layout.constraint_lifetime_dashboard, container, false);
     }
 
     @Override

@@ -362,6 +362,11 @@
     <string name="lifetime">Lifetime</string>
     <string name="monthly">Monthly</string>
     <string name="yearly">Yearly</string>
+    <string name="viewGithub">View Github</string>
+    <string name="actionToggleLineValues">Line Values</string>
+    <string name="actionToggleBarValues">Bar Values</string>
+    <string name="actionRemoveDataSet">Remove Data Set</string>
+    <string name="combinedCharts">Combined Charts</string>
 
 
     <!--===============================================================================================-->

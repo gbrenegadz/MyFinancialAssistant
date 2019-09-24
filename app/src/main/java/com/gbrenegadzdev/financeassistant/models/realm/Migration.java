@@ -89,6 +89,16 @@ public class Migration implements RealmMigration {
                 paidToEntitySchema.addField(PaidToEntity.PAID_TO_ENTITY_NAME, String.class);
                 paidToEntitySchema.addField(PaidToEntity.CREATED_DATETIME, Date.class);
             }
+
+            RealmObjectSchema monthlyReportSchema = schema.get(MonthlyReport.class.getSimpleName());
+            if (monthlyReportSchema != null) {
+                monthlyReportSchema.addField(MonthlyReport.MONTHLY_REPORT_ID, String.class);
+                monthlyReportSchema.addField(MonthlyReport.REPORT_TYPE, int.class);
+                monthlyReportSchema.addField(MonthlyReport.YEAR, int.class);
+                monthlyReportSchema.addField(MonthlyReport.MONTH, String.class);
+                monthlyReportSchema.addField(MonthlyReport.AMOUNT, double.class);
+                monthlyReportSchema.addField(MonthlyReport.CREATED_DATETIME, Date.class);
+            }
         }
     }
 }
