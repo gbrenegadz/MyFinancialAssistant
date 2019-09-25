@@ -146,8 +146,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_dashboard) {
             // Handle the camera action
-            Intent intent = new Intent(this, CombinedChartActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(this, CombinedChartActivity.class);
+//            startActivity(intent);
         } else if (id == R.id.nav_income) {
             Intent intent = new Intent(this, IncomeActivity.class);
             startActivity(intent);
