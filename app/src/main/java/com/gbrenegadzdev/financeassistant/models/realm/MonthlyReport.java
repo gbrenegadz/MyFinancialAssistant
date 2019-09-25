@@ -9,7 +9,7 @@ public class MonthlyReport extends RealmObject {
     public static final String REPORT_TYPE = "reportType";
     public static final String YEAR = "year";
     public static final String MONTH = "month";
-    public static final String AMOUNT = "amount";
+    public static final String AMOUNT = "amount"; // Update the value whenever income or expense is done
     public static final String CREATED_DATETIME = "createdDatetime";
 
     private String monthlyReportId;

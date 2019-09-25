@@ -4,6 +4,7 @@ import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class CategorySetup extends RealmObject {
     public static final String CATEGORY_ID = "categoryId";
@@ -13,6 +14,7 @@ public class CategorySetup extends RealmObject {
     public static final String IS_DELETABLE = "isDeletable";
     public static final String SUB_CATEGORY_LIST = "subCategoryList";
 
+    @PrimaryKey
     private String categoryId;
     private String categoryName;
     private Date createdDatetime;

@@ -1,9 +1,9 @@
 package com.gbrenegadzdev.financeassistant.models.realm;
 
-import java.lang.ref.SoftReference;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class Income extends RealmObject {
     public static final String INCOME_ID = "incomeId";
@@ -14,6 +14,7 @@ public class Income extends RealmObject {
     public static final String CREATED_DATETIME = "createdDatetime";
     public static final String MODIFIED_DATETIME = "modifiedDatetime";
 
+    @PrimaryKey
     private String incomeId;
     private String incomeName;
     private double amount;

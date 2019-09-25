@@ -3,12 +3,14 @@ package com.gbrenegadzdev.financeassistant.models.realm;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class PaidToEntity extends RealmObject {
     public static final String PAID_TO_ENTITY_ID = "paidToId";
     public static final String PAID_TO_ENTITY_NAME = "paidToEntityName";
     public static final String CREATED_DATETIME = "createdDatetime";
 
+    @PrimaryKey
     private String paidToId;
     private String paidToEntityName;
     private Date createdDatetime;

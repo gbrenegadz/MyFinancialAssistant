@@ -3,6 +3,7 @@ package com.gbrenegadzdev.financeassistant.models.realm;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class SalaryDeductionSetup extends RealmObject {
     public static final String SALARY_DEDUCTION_ID = "salaryDeductionId";
@@ -11,6 +12,7 @@ public class SalaryDeductionSetup extends RealmObject {
     public static final String MODIFIED_DATETIME = "modifiedDatetime";
     public static final String IS_SELECTED = "isSelected";
 
+    @PrimaryKey
     private String salaryDeductionId;
     private String deductionName;
     private Date createdDatetime;

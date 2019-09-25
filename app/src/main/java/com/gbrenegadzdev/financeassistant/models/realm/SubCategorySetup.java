@@ -3,6 +3,7 @@ package com.gbrenegadzdev.financeassistant.models.realm;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class SubCategorySetup extends RealmObject {
     public static final String SUB_CATEGORY_ID = "subCategoryId";
@@ -12,6 +13,7 @@ public class SubCategorySetup extends RealmObject {
     public static final String IS_DELETABLE = "isDeletable";
     public static final String IS_SHOWN = "isShown";
 
+    @PrimaryKey
     private String subCategoryId;
     private String subCategoryName;
     private Date createdDatetime;

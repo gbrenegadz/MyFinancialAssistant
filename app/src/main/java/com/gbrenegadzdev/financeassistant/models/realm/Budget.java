@@ -3,6 +3,7 @@ package com.gbrenegadzdev.financeassistant.models.realm;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class Budget extends RealmObject {
     public static final String BUDGET_ID = "budgetId";
@@ -14,6 +15,7 @@ public class Budget extends RealmObject {
     public static final String CREATED_DATETIME = "createdDatetime";
     public static final String MODIFIED_DATETIME = "modifiedDatetime";
 
+    @PrimaryKey
     private String budgetId;
     private String budgetName;
     private double amount;
