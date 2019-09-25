@@ -41,6 +41,10 @@ public class MonthlyDashboardFragment extends Fragment {
     private Realm monthlyDashboardRealm;
 
     public static final String[] MONTHS = new String[] {
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
+    public static final String[] MONTHS2 = new String[] {
             "", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
@@ -160,11 +164,6 @@ public class MonthlyDashboardFragment extends Fragment {
         CombinedData data = new CombinedData();
 
         data.setData(generateLineData());
-//        data.setData(generateBarData());
-//        data.setData(generateBubbleData());
-//        data.setData(generateScatterData());
-//        data.setData(generateCandleData());
-//        data.setValueTypeface(tfLight);
 
         xAxis.setAxisMaximum(data.getXMax());
 
@@ -208,18 +207,13 @@ public class MonthlyDashboardFragment extends Fragment {
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return MONTHS[(int) value % MONTHS.length];
+                return MONTHS2[(int) value % MONTHS2.length];
             }
         });
 
         CombinedData data = new CombinedData();
 
-//        data.setData(generateLineData());
         data.setData(generateBarData());
-//        data.setData(generateBubbleData());
-//        data.setData(generateScatterData());
-//        data.setData(generateCandleData());
-//        data.setValueTypeface(tfLight);
 
         xAxis.setAxisMaximum(data.getXMax() + 2);
 
@@ -246,6 +240,7 @@ public class MonthlyDashboardFragment extends Fragment {
         if (monthlyExpenseReportRealmResults != null) {
             int counter = 0;
             for (MonthlyReport monthlyReport : monthlyExpenseReportRealmResults) {
+                Log.e(TAG, "Monthly Expense Report : " + monthlyReport.toString());
                 totalExpense += monthlyReport.getAmount();
                 entries2.add(new Entry(counter, (float) totalExpense));
                 counter++;
@@ -299,7 +294,7 @@ public class MonthlyDashboardFragment extends Fragment {
         if (monthlyExpenseReportRealmResults != null) {
             int index = 0;
             for (MonthlyReport monthlyReport : monthlyExpenseReportRealmResults) {
-                entries2.add(new BarEntry(0, (float) monthlyReport.getAmount()));
+                entries2.add(new BarEntry(index, (float) monthlyReport.getAmount()));
                 index++;
             }
         }
