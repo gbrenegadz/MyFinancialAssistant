@@ -119,6 +119,11 @@ public class MonthlyDashboardFragment extends Fragment {
         monthlyExpenseReportRealmResults = monthlyDashboardRealm.where(MonthlyReport.class)
                 .equalTo(MonthlyReport.REPORT_TYPE, Constants.REPORT_TYPE_EXPENSE)
                 .findAll();
+        if (monthlyExpenseReportRealmResults != null) {
+            for (MonthlyReport expenseReport : monthlyExpenseReportRealmResults) {
+                Log.e(TAG,"monthlyExpenseReportRealmResults : " + monthlyExpenseReportRealmResults);
+            }
+        }
     }
 
     private void setupLineChart() {
@@ -230,6 +235,7 @@ public class MonthlyDashboardFragment extends Fragment {
         if (monthlyIncomeReportRealmResults != null) {
             int index = 0;
             for (MonthlyReport monthlyReport : monthlyIncomeReportRealmResults) {
+                Log.e(TAG, "Monthly Income Report : " + monthlyReport.toString());
                 totalIncome += monthlyReport.getAmount();
                 entries.add(new Entry(index, (float) totalIncome));
                 index++;
@@ -305,7 +311,7 @@ public class MonthlyDashboardFragment extends Fragment {
         if (monthlyIncomeReportRealmResults != null) {
             int index = 0;
             for (MonthlyReport monthlyReport : monthlyIncomeReportRealmResults) {
-                Log.d(TAG, "Monthly Report : " + monthlyReport.toString());
+                Log.d(TAG, "Monthly Report Income : " + monthlyReport.toString());
                 entries1.add(new BarEntry(index, (float) monthlyReport.getAmount()));
                 index++;
             }
@@ -324,6 +330,7 @@ public class MonthlyDashboardFragment extends Fragment {
         if (monthlyExpenseReportRealmResults != null) {
             int index = 0;
             for (MonthlyReport monthlyReport : monthlyExpenseReportRealmResults) {
+                Log.d(TAG, "Monthly Report Expense : " + monthlyReport.toString());
                 entries2.add(new BarEntry(index, (float) monthlyReport.getAmount()));
                 index++;
             }

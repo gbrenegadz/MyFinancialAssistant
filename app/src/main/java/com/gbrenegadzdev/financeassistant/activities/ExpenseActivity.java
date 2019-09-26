@@ -22,8 +22,10 @@ import com.gbrenegadzdev.financeassistant.adapters.ExpenseRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Expense;
 import com.gbrenegadzdev.financeassistant.models.realm.Income;
+import com.gbrenegadzdev.financeassistant.models.realm.MonthlyReport;
 import com.gbrenegadzdev.financeassistant.models.realm.PaidToEntity;
 import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
+import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
@@ -339,17 +341,22 @@ public class ExpenseActivity extends AppCompatActivity {
             final String finalPaidToEntity = mPaidTo.getText().toString();
             final String finalValue = mValue.getText().toString();
 
-            expenseRealm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    try {
-                        if (action == EXPENSE_ADD) {
+            if (action == EXPENSE_ADD) {
+                expenseRealm.executeTransactionAsync(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        try {
                             final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
+                            final String stringMonth = dateTimeUtils.getStringMonth(currentDatetime);
+                            final int intYear = dateTimeUtils.getIntYear(currentDatetime);
+
+                            final double amount = Double.parseDouble(finalValue.replace(",", ""));
+
                             final Expense newExpense = new Expense();
                             newExpense.setExpenseId(UUID.randomUUID().toString());
                             newExpense.setExpenseName(finalName);
                             newExpense.setPaidTo(finalPaidToEntity);
-                            newExpense.setAmount(Double.parseDouble(finalValue.replace(",", "")));
+                            newExpense.setAmount(amount);
                             newExpense.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
                             newExpense.setYear(dateTimeUtils.getIntYear(currentDatetime));
                             newExpense.setCreatedDatetime(currentDatetime);
@@ -357,6 +364,11 @@ public class ExpenseActivity extends AppCompatActivity {
                             realm.insert(newExpense);
 
                             Log.d(TAG, "New Expense : " + newExpense.toString());
+
+                            // Update the value of Monthly Report
+                            // Just Add the value
+                            new MonthlyReport(Constants.REPORT_TYPE_EXPENSE, intYear, stringMonth, amount)
+                                    .addUpdateAmount();
 
                             // Show Snackbar notification
                             snackbarUtils.create(view,
@@ -367,7 +379,62 @@ public class ExpenseActivity extends AppCompatActivity {
                                             dialogInterface.dismiss();
                                         }
                                     }).show();
-                        } else if (action == EXPENSE_UPDATE) {
+                        } catch (RealmException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.expense)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                        }
+                                    }).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.expense)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                        }
+                                    }).show();
+                        } finally {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mAdapter.getItemCount() == 0) {
+                                        queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+                                    } else {
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                    updateSubtitle(mAdapter.getItemCount());
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                        }
+                    }
+                });
+            } else if (action == EXPENSE_UPDATE) {
+                expenseRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        try {
+                            final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
+                            final String stringMonth = dateTimeUtils.getStringMonth(currentDatetime);
+                            final int intYear = dateTimeUtils.getIntYear(currentDatetime);
+
+                            // Compute first the difference between the old amount and the updated amount
+                            // This will be used to update the Monthly Report
+                            final double oldAmount = selectedExpense.getAmount();
+                            final double diff = Double.parseDouble(finalValue.replace(",", "")) - oldAmount;
+
                             selectedExpense.setExpenseName(finalName);
                             selectedExpense.setPaidTo(finalPaidToEntity);
                             selectedExpense.setAmount(Double.parseDouble(finalValue.replace(",", "")));
@@ -375,6 +442,11 @@ public class ExpenseActivity extends AppCompatActivity {
                             realm.insertOrUpdate(selectedExpense);
 
                             Log.d(TAG, "Updated Expense : " + selectedExpense.toString());
+
+                            // Update the value of Monthly Report
+                            // Just Add the value
+                            new MonthlyReport(Constants.REPORT_TYPE_EXPENSE, intYear, stringMonth, diff)
+                                    .addUpdateAmount();
 
 
                             // Show Snackbar notification
@@ -386,59 +458,60 @@ public class ExpenseActivity extends AppCompatActivity {
 
                                         }
                                     }).show();
-                        }
+                        } catch (RealmException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
 
-                        // Check if Paid To Entity exist
-                        // If false, save it
-                        final PaidToEntity paidToEntity = realm.where(PaidToEntity.class)
-                                .equalTo(PaidToEntity.PAID_TO_ENTITY_NAME, finalPaidToEntity, Case.INSENSITIVE)
-                                .findFirst();
-                        if (paidToEntity == null) {
-                            final PaidToEntity newPaidToEntity = new PaidToEntity();
-                            newPaidToEntity.setPaidToId(UUID.randomUUID().toString());
-                            newPaidToEntity.setPaidToEntityName(finalPaidToEntity);
-                            newPaidToEntity.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());
-                            realm.insert(newPaidToEntity);
-                        }
-                    } catch (RealmException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.expense)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
 
-                        // Show Snackbar error notification
-                        snackbarUtils.create(view,
-                                getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.expense)),
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
+                                        }
+                                    }).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
 
-                                    }
-                                }).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.expense)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
 
-                        // Show Snackbar error notification
-                        snackbarUtils.create(view,
-                                getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.expense)),
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-
-                                    }
-                                }).show();
-                    } finally {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mAdapter.getItemCount() == 0) {
-                                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-                                } else {
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                                updateSubtitle(mAdapter.getItemCount());
-                                dialogInterface.dismiss();
+                                        }
+                                    }).show();
+                        } finally {
+                            if (mAdapter.getItemCount() == 0) {
+                                queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+                            } else {
+                                mAdapter.notifyDataSetChanged();
                             }
-                        });
+                            updateSubtitle(mAdapter.getItemCount());
+                            dialogInterface.dismiss();
+                        }
+                    }
+                });
+
+            }
+
+            // Check if Paid To Entity exist
+            // If false, save it
+            expenseRealm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    final PaidToEntity paidToEntity = realm.where(PaidToEntity.class)
+                            .equalTo(PaidToEntity.PAID_TO_ENTITY_NAME, finalPaidToEntity, Case.INSENSITIVE)
+                            .findFirst();
+                    if (paidToEntity == null) {
+                        final PaidToEntity newPaidToEntity = new PaidToEntity();
+                        newPaidToEntity.setPaidToId(UUID.randomUUID().toString());
+                        newPaidToEntity.setPaidToEntityName(finalPaidToEntity);
+                        newPaidToEntity.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());
+                        realm.insert(newPaidToEntity);
                     }
                 }
             });
