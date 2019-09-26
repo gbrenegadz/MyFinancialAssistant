@@ -67,7 +67,7 @@ public class SetupCategoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setup_category);
 
         initUI();
-        setupDefaultCategories();
+//        setupDefaultCategories();
         queryCategory();
         initListeners();
     }

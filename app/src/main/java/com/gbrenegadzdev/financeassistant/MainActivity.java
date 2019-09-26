@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,28 +17,27 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
-import com.gbrenegadzdev.financeassistant.activities.CombinedChartActivity;
 import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.activities.SetupCategoryActivity;
 import com.gbrenegadzdev.financeassistant.fragments.LifetimeDashboardFragment;
 import com.gbrenegadzdev.financeassistant.fragments.MonthlyDashboardFragment;
-import com.gbrenegadzdev.financeassistant.models.realm.Expense;
-import com.gbrenegadzdev.financeassistant.models.realm.Income;
+import com.gbrenegadzdev.financeassistant.models.realm.CategorySetup;
+import com.gbrenegadzdev.financeassistant.models.realm.SubCategorySetup;
 import com.gbrenegadzdev.financeassistant.utils.Constants;
+import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
-import io.realm.RealmResults;
-import io.realm.Sort;
+import io.realm.RealmList;
 import io.realm.exceptions.RealmException;
 
 public class MainActivity extends AppCompatActivity
@@ -48,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private Realm mainActivityRealm;
 
     private StringUtils stringUtils = new StringUtils();
+    private DateTimeUtils dateTimeUtils = new DateTimeUtils();
 
     private Toolbar toolbar;
     private DrawerLayout drawer;
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity
 
         initUI();
         initListeners();
+        setupDefaultCategories();
     }
 
     private void initUI() {
@@ -207,5 +207,116 @@ public class MainActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+    }
+
+    private void setupDefaultCategories() {
+        final Date currentDate = dateTimeUtils.getCurrentDatetime();
+
+        mainActivityRealm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    final String[] expenseCategoryList = getResources().getStringArray(R.array.expense_category);
+                    for (int ex = 0; ex < expenseCategoryList.length; ex++) {
+                        // Check if expense category already exist
+                        final CategorySetup category = realm.where(CategorySetup.class)
+                                .equalTo(CategorySetup.CATEGORY_NAME, expenseCategoryList[ex])
+                                .findFirst();
+                        if (category == null) {
+                            // Create object for Category
+                            final CategorySetup newCategory = new CategorySetup();
+                            newCategory.setCategoryId(UUID.randomUUID().toString());
+                            newCategory.setCategoryName(expenseCategoryList[ex]);
+                            newCategory.setCreatedDatetime(currentDate);
+                            newCategory.setEditable(false);
+                            newCategory.setDeletable(false);
+
+                            // Setup Category's Sub-Categories
+                            RealmList<SubCategorySetup> foodSubcategoriesList = new RealmList<>();
+                            final String[] subCategories = getSubcategoryList(expenseCategoryList[ex]);
+                            if (subCategories != null) {
+                                for (int i = 0; i < subCategories.length; i++) {
+                                    final String subCategory = subCategories[i];
+                                    Log.e("Array", "Food #" + i + " : " + subCategory);
+                                    final SubCategorySetup newSubCategorySetup = new SubCategorySetup();
+                                    newSubCategorySetup.setSubCategoryId(UUID.randomUUID().toString());
+                                    newSubCategorySetup.setSubCategoryName(expenseCategoryList[ex].concat(" - ").concat(subCategory));
+                                    newSubCategorySetup.setCreatedDatetime(currentDate);
+                                    newSubCategorySetup.setEditable(false);
+                                    newSubCategorySetup.setDeletable(false);
+                                    newSubCategorySetup.setShown(true);
+
+                                    foodSubcategoriesList.add(newSubCategorySetup);
+                                }
+                            }
+
+                            newCategory.setSubCategoryList(foodSubcategoriesList);
+                            realm.insert(newCategory);
+                        }
+                    }
+                } catch (RealmException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                }
+            }
+        });
+    }
+
+    private String[] getSubcategoryList(String category) {
+        if (category.equalsIgnoreCase(Constants.FOOD)) {
+            return getResources().getStringArray(R.array.food);
+        }
+        if (category.equalsIgnoreCase(Constants.TAXES)) {
+            return getResources().getStringArray(R.array.taxes);
+        }
+        if (category.equalsIgnoreCase(Constants.TRANSPORTATION)) {
+            return getResources().getStringArray(R.array.transportation);
+        }
+        if (category.equalsIgnoreCase(Constants.HOUSING)) {
+            return getResources().getStringArray(R.array.housing);
+        }
+        if (category.equalsIgnoreCase(Constants.HEALTH_CARE)) {
+            return getResources().getStringArray(R.array.health_care);
+        }
+        if (category.equalsIgnoreCase(Constants.SAVINGS)) {
+            return getResources().getStringArray(R.array.savings);
+        }
+        if (category.equalsIgnoreCase(Constants.INSURANCE)) {
+            return getResources().getStringArray(R.array.insurance);
+        }
+        if (category.equalsIgnoreCase(Constants.SERVICES_MEMBERSHIP)) {
+            return getResources().getStringArray(R.array.services_membership);
+        }
+        if (category.equalsIgnoreCase(Constants.CHILD_EXPENSE)) {
+            return getResources().getStringArray(R.array.child_expenses);
+        }
+        if (category.equalsIgnoreCase(Constants.HOME_SUPPLIES)) {
+            return getResources().getStringArray(R.array.home_supplies);
+        }
+        if (category.equalsIgnoreCase(Constants.UTILITIES)) {
+            return getResources().getStringArray(R.array.utilities);
+        }
+        if (category.equalsIgnoreCase(Constants.PERSONAL_CARE)) {
+            return getResources().getStringArray(R.array.personal_care);
+        }
+        if (category.equalsIgnoreCase(Constants.FUN)) {
+            return getResources().getStringArray(R.array.fun);
+        }
+        if (category.equalsIgnoreCase(Constants.PETS)) {
+            return getResources().getStringArray(R.array.pets);
+        }
+        if (category.equalsIgnoreCase(Constants.CLOTHES)) {
+            return getResources().getStringArray(R.array.clothes);
+        }
+        if (category.equalsIgnoreCase(Constants.CONSUMER_DEBT)) {
+            return getResources().getStringArray(R.array.consumer_debt);
+        }
+        if (category.equalsIgnoreCase(Constants.GIVING)) {
+            return getResources().getStringArray(R.array.giving);
+        }
+        return null;
     }
 }
