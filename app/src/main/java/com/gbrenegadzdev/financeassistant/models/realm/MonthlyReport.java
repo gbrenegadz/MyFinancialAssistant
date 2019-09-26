@@ -1,10 +1,21 @@
 package com.gbrenegadzdev.financeassistant.models.realm;
 
-import java.util.Date;
+import android.util.Log;
 
+import com.gbrenegadzdev.financeassistant.utils.Constants;
+import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
+
+import java.util.Date;
+import java.util.UUID;
+
+import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.exceptions.RealmException;
 
 public class MonthlyReport extends RealmObject {
+    private static final String TAG = MonthlyReport.class.getSimpleName();
+
     public static final String MONTHLY_REPORT_ID = "monthlyReportId";
     public static final String REPORT_TYPE = "reportType";
     public static final String YEAR = "year";
@@ -12,6 +23,17 @@ public class MonthlyReport extends RealmObject {
     public static final String AMOUNT = "amount"; // Update the value whenever income or expense is done
     public static final String CREATED_DATETIME = "createdDatetime";
 
+    public MonthlyReport() {
+    }
+
+    public MonthlyReport(int reportType, int year, String month, double amount) {
+        this.reportType = reportType;
+        this.year = year;
+        this.month = month;
+        this.amount = amount;
+    }
+
+    @PrimaryKey
     private String monthlyReportId;
     private int reportType;
     private int year;
@@ -77,5 +99,45 @@ public class MonthlyReport extends RealmObject {
                 ", amount=" + amount +
                 ", createdDatetime=" + createdDatetime +
                 '}';
+    }
+
+    /**
+     * Methods for saving or updating Monthly Report
+     */
+    public void addUpdateAmount() {
+        Log.d(TAG, "Amount : " + amount + "\tMonth : " + month + "\tYear : " + year + "\tReport Type : " + reportType);
+        final Realm realm = Realm.getDefaultInstance();
+        try {
+            final MonthlyReport updateMonthlyReport = realm.where(MonthlyReport.class)
+                    .equalTo(MonthlyReport.REPORT_TYPE, reportType)
+                    .equalTo(MonthlyReport.YEAR, year)
+                    .equalTo(MonthlyReport.MONTH, month)
+                    .findFirst();
+            if (updateMonthlyReport != null) {
+                final double newAmount = updateMonthlyReport.getAmount() + amount;
+                updateMonthlyReport.setAmount(newAmount);
+
+                realm.insertOrUpdate(updateMonthlyReport);
+            } else {
+                final DateTimeUtils dateTimeUtils = new DateTimeUtils();
+                final MonthlyReport newMonthlyReport = new MonthlyReport();
+                newMonthlyReport.setMonthlyReportId(UUID.randomUUID().toString());
+                newMonthlyReport.setReportType(reportType);
+                newMonthlyReport.setYear(year);
+                newMonthlyReport.setMonth(month);
+                newMonthlyReport.setAmount(amount);
+                newMonthlyReport.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());
+
+                realm.insert(newMonthlyReport);
+            }
+        } catch (RealmException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+        } finally {
+            realm.close();
+        }
     }
 }

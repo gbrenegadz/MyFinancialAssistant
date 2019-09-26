@@ -368,6 +368,9 @@
     <string name="actionRemoveDataSet">Remove Data Set</string>
     <string name="combinedCharts">Combined Charts</string>
     <string name="app_version">Closed Alpha v0.0.1</string>
+    <string name="income_updated">Income Updated</string>
+    <string name="income_title">Income</string>
+    <string name="income_added">Income Added</string>
 
 
     <!--===============================================================================================-->

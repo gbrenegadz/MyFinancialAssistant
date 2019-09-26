@@ -9,12 +9,16 @@ import java.util.GregorianCalendar;
 
 public class DateTimeUtils {
 
+    public static final String[] MONTHS = new String[] {
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
     public Date getCurrentDatetime() {
         return new Date();
     }
 
     public String getStringMonth(Date date) {
-        Date today = new Date();
+        Date today = date;
         Calendar cal = Calendar.getInstance();
         cal.setTime(today); // don't forget this if date is arbitrary
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK); // 1 being Sunday
@@ -28,7 +32,7 @@ public class DateTimeUtils {
     }
 
     public int getIntMonth(Date date) {
-        Date today = new Date();
+        Date today = date;
         Calendar cal = Calendar.getInstance();
         cal.setTime(today); // don't forget this if date is arbitrary
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK); // 1 being Sunday
@@ -43,7 +47,7 @@ public class DateTimeUtils {
 
 
     public int getIntYear(Date date) {
-        Date today = new Date();
+        Date today = date;
         Calendar cal = Calendar.getInstance();
         cal.setTime(today); // don't forget this if date is arbitrary
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK); // 1 being Sunday
@@ -57,7 +61,7 @@ public class DateTimeUtils {
     }
 
     public int getIntDayOfMonth(Date date) {
-        Date today = new Date();
+        Date today = date;
         Calendar cal = Calendar.getInstance();
         cal.setTime(today); // don't forget this if date is arbitrary
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK); // 1 being Sunday

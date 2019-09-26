@@ -8,6 +8,8 @@ import android.os.Bundle;
 import com.gbrenegadzdev.financeassistant.adapters.IncomeRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Income;
+import com.gbrenegadzdev.financeassistant.models.realm.MonthlyReport;
+import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
@@ -245,7 +247,7 @@ public class IncomeActivity extends AppCompatActivity {
         mValue.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         // Check if action is for Updating
-        // If Yes, then query the current Budget to edit
+        // If Yes, then query the current Income to edit
         final Income selectedIncome = (Income) realmObject;
         if (selectedIncome != null) {
             if (action == INCOME_UPDATE) {
@@ -260,7 +262,7 @@ public class IncomeActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialogInterface, int i) {
-                        saveNewBudget(view, mNameAutoComplete, mValue, action, dialogInterface, selectedIncome);
+                        saveNewIncome(view, mNameAutoComplete, mValue, action, dialogInterface, selectedIncome);
                     }
                 },
                 new DialogInterface.OnClickListener() {
@@ -274,7 +276,7 @@ public class IncomeActivity extends AppCompatActivity {
         }
     }
 
-    private void saveNewBudget(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, TextInputEditText mValue, final int action, final DialogInterface dialogInterface, final Income selectedIncome) {
+    private void saveNewIncome(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, TextInputEditText mValue, final int action, final DialogInterface dialogInterface, final Income selectedIncome) {
         boolean isValidatedInput = true;
         if (mNameAutoComplete.getText() != null) {
             Log.e(TAG, "mNameAutoComplete.getText() is not null");
@@ -307,94 +309,159 @@ public class IncomeActivity extends AppCompatActivity {
             final String finalName = mNameAutoComplete.getText().toString();
             final String finalValue = mValue.getText().toString();
 
-            incomeRealm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    try {
-                        if (action == INCOME_ADD) {
+            if (action == INCOME_ADD) {
+                incomeRealm.executeTransactionAsync(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        try {
                             final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
+                            final String stringMonth = dateTimeUtils.getStringMonth(currentDatetime);
+                            final int intYear = dateTimeUtils.getIntYear(currentDatetime);
+
+                            final double amount = Double.parseDouble(finalValue.replace(",", ""));
+
                             final Income newIncome = new Income();
                             newIncome.setIncomeId(UUID.randomUUID().toString());
                             newIncome.setIncomeName(finalName);
-                            newIncome.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                            newIncome.setMonth(dateTimeUtils.getStringMonth(currentDatetime));
-                            newIncome.setYear(dateTimeUtils.getIntYear(currentDatetime));
+                            newIncome.setAmount(amount);
+                            newIncome.setMonth(stringMonth);
+                            newIncome.setYear(intYear);
                             newIncome.setCreatedDatetime(currentDatetime);
                             newIncome.setModifiedDatetime(currentDatetime);
                             realm.insert(newIncome);
+
+                            // Update the value of Monthly Report
+                            // Just Add the value
+                            new MonthlyReport(Constants.REPORT_TYPE_INCOME, intYear, stringMonth, amount)
+                                    .addUpdateAmount();
 
                             Log.d(TAG, "New Income : " + newIncome.toString());
 
                             // Show Snackbar notification
                             snackbarUtils.create(view,
-                                    getString(R.string.budget_added).concat(" \"").concat(newIncome.getIncomeName()).concat("\""),
+                                    getString(R.string.income_added).concat(" \"").concat(newIncome.getIncomeName()).concat("\""),
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
                                             dialogInterface.dismiss();
                                         }
                                     }).show();
-                        } else if (action == INCOME_UPDATE) {
-                            selectedIncome.setIncomeName(finalName);
-                            selectedIncome.setAmount(Double.parseDouble(finalValue.replace(",", "")));
-                            selectedIncome.setModifiedDatetime(dateTimeUtils.getCurrentDatetime());
-                            realm.insertOrUpdate(selectedIncome);
+                        } catch (RealmException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
 
-                            Log.d(TAG, "Updated Budget : " + selectedIncome.toString());
-
-
-                            // Show Snackbar notification
+                            // Show Snackbar error notification
                             snackbarUtils.create(view,
-                                    getString(R.string.budget_updated).concat(" \"").concat(selectedIncome.getIncomeName()).concat("\""),
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.income_title)),
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
 
                                         }
                                     }).show();
-                        }
-                    } catch (RealmException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
 
-                        // Show Snackbar error notification
-                        snackbarUtils.create(view,
-                                getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.budget_title)),
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.income_title)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
 
+                                        }
+                                    }).show();
+                        } finally {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mAdapter.getItemCount() == 0) {
+                                        queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+                                    } else {
+                                        mAdapter.notifyDataSetChanged();
                                     }
-                                }).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
-
-                        // Show Snackbar error notification
-                        snackbarUtils.create(view,
-                                getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.budget_title)),
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-
-                                    }
-                                }).show();
-                    } finally {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mAdapter.getItemCount() == 0) {
-                                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-                                } else {
-                                    mAdapter.notifyDataSetChanged();
+                                    updateSubtitle(mAdapter.getItemCount());
+                                    dialogInterface.dismiss();
                                 }
-                                updateSubtitle(mAdapter.getItemCount());
-                                dialogInterface.dismiss();
-                            }
-                        });
+                            });
+                        }
                     }
-                }
-            });
+                });
+            } else if (action == INCOME_UPDATE) {
+                incomeRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        try {
+                            final Date currentDatetime = dateTimeUtils.getCurrentDatetime();
+                            final String stringMonth = dateTimeUtils.getStringMonth(currentDatetime);
+                            final int intYear = dateTimeUtils.getIntYear(currentDatetime);
+
+                            // Compute first the difference between the old amount and the updated amount
+                            // This will be used to update the Monthly Report
+                            final double oldAmount = selectedIncome.getAmount();
+                            final double diff = Double.parseDouble(finalValue.replace(",", "")) - oldAmount;
+
+                            selectedIncome.setIncomeName(finalName);
+                            selectedIncome.setAmount(Double.parseDouble(finalValue.replace(",", "")));
+                            selectedIncome.setModifiedDatetime(dateTimeUtils.getCurrentDatetime());
+                            realm.insertOrUpdate(selectedIncome);
+
+                            Log.d(TAG, "Updated Income : " + selectedIncome.toString());
+
+                            // Update the value of Monthly Report
+                            // Just Add the value
+                            new MonthlyReport(Constants.REPORT_TYPE_INCOME, intYear, stringMonth, diff)
+                                    .addUpdateAmount();
+
+
+                            // Show Snackbar notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.income_updated).concat(" \"").concat(selectedIncome.getIncomeName()).concat("\""),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                        }
+                                    }).show();
+                        } catch (RealmException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.income_title)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                        }
+                                    }).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused by : " + e.getCause());
+
+                            // Show Snackbar error notification
+                            snackbarUtils.create(view,
+                                    getString(R.string.failed_to_save).concat(" ").concat(getString(R.string.income_title)),
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+
+                                        }
+                                    }).show();
+                        } finally {
+                            if (mAdapter.getItemCount() == 0) {
+                                queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
+                            } else {
+                                mAdapter.notifyDataSetChanged();
+                            }
+                            updateSubtitle(mAdapter.getItemCount());
+                            dialogInterface.dismiss();
+                        }
+                    }
+                });
+            }
         } else {
             // Show Snackbar error notification
             snackbarUtils.create(view,

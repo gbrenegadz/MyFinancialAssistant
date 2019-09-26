@@ -77,7 +77,7 @@ public class MonthlyDashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initUI();
-        setupMonthlyReport();
+//        setupMonthlyReport(); // This is for testing only
         getIncome();
         getExpense();
         setupLineChart();
@@ -228,22 +228,42 @@ public class MonthlyDashboardFragment extends Fragment {
 
         double totalIncome = 0;
         if (monthlyIncomeReportRealmResults != null) {
-            int counter = 0;
+            int index = 0;
             for (MonthlyReport monthlyReport : monthlyIncomeReportRealmResults) {
                 totalIncome += monthlyReport.getAmount();
-                entries.add(new Entry(counter, (float) totalIncome));
-                counter++;
+                entries.add(new Entry(index, (float) totalIncome));
+                index++;
+            }
+
+            if (index < MONTHS.length) {
+                for (int i = index; i < MONTHS.length; i++) {
+                    entries.add(new Entry(i, (float) 0));
+                }
+            }
+        } else {
+            for (int i =0; i < MONTHS.length; i++) {
+                entries.add(new Entry(i, (float) totalIncome));
             }
         }
 
         double totalExpense = 0;
         if (monthlyExpenseReportRealmResults != null) {
-            int counter = 0;
+            int index = 0;
             for (MonthlyReport monthlyReport : monthlyExpenseReportRealmResults) {
                 Log.e(TAG, "Monthly Expense Report : " + monthlyReport.toString());
                 totalExpense += monthlyReport.getAmount();
-                entries2.add(new Entry(counter, (float) totalExpense));
-                counter++;
+                entries2.add(new Entry(index, (float) totalExpense));
+                index++;
+            }
+
+            if (index < MONTHS.length) {
+                for (int i = index; i < MONTHS.length; i++) {
+                    entries2.add(new Entry(i, (float) 0));
+                }
+            }
+        } else {
+            for (int i =0; i < MONTHS.length; i++) {
+                entries2.add(new Entry(0, (float) totalExpense));
             }
         }
 
@@ -289,6 +309,16 @@ public class MonthlyDashboardFragment extends Fragment {
                 entries1.add(new BarEntry(index, (float) monthlyReport.getAmount()));
                 index++;
             }
+
+            if (index < MONTHS.length) {
+                for (int i = index; i < MONTHS.length; i++) {
+                    entries1.add(new BarEntry(i, (float) 0));
+                }
+            }
+        } else {
+            for (int i =0; i < MONTHS.length; i++) {
+                entries1.add(new BarEntry(0, (float) 0));
+            }
         }
 
         if (monthlyExpenseReportRealmResults != null) {
@@ -296,6 +326,16 @@ public class MonthlyDashboardFragment extends Fragment {
             for (MonthlyReport monthlyReport : monthlyExpenseReportRealmResults) {
                 entries2.add(new BarEntry(index, (float) monthlyReport.getAmount()));
                 index++;
+            }
+
+            if (index < MONTHS.length) {
+                for (int i = index; i < MONTHS.length; i++) {
+                    entries2.add(new BarEntry(i, (float) 0));
+                }
+            }
+        } else {
+            for (int i =0; i < MONTHS.length; i++) {
+                entries2.add(new BarEntry(0, (float) 0));
             }
         }
 
