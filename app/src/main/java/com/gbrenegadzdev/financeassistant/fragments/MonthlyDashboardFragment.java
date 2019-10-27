@@ -40,11 +40,11 @@ public class MonthlyDashboardFragment extends Fragment {
     private static final String TAG = MonthlyDashboardFragment.class.getSimpleName();
     private Realm monthlyDashboardRealm;
 
-    public static final String[] MONTHS = new String[] {
+    public static final String[] MONTHS = new String[]{
             "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
-    public static final String[] MONTHS2 = new String[] {
+    public static final String[] MONTHS2 = new String[]{
             "", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
@@ -82,6 +82,8 @@ public class MonthlyDashboardFragment extends Fragment {
         getExpense();
         setupLineChart();
         setupBarChart();
+
+        deleteAllTestReport();
     }
 
     @Override
@@ -113,6 +115,11 @@ public class MonthlyDashboardFragment extends Fragment {
         monthlyIncomeReportRealmResults = monthlyDashboardRealm.where(MonthlyReport.class)
                 .equalTo(MonthlyReport.REPORT_TYPE, Constants.REPORT_TYPE_INCOME)
                 .findAll();
+        if (monthlyIncomeReportRealmResults != null) {
+            for (MonthlyReport incomeReport : monthlyIncomeReportRealmResults) {
+                Log.e(TAG, "monthlyIncomeReportRealmResults : " + incomeReport.toString());
+            }
+        }
     }
 
     private void getExpense() {
@@ -121,7 +128,7 @@ public class MonthlyDashboardFragment extends Fragment {
                 .findAll();
         if (monthlyExpenseReportRealmResults != null) {
             for (MonthlyReport expenseReport : monthlyExpenseReportRealmResults) {
-                Log.e(TAG,"monthlyExpenseReportRealmResults : " + monthlyExpenseReportRealmResults);
+                Log.e(TAG, "monthlyExpenseReportRealmResults : " + expenseReport.toString());
             }
         }
     }
@@ -247,7 +254,7 @@ public class MonthlyDashboardFragment extends Fragment {
                 }
             }
         } else {
-            for (int i =0; i < MONTHS.length; i++) {
+            for (int i = 0; i < MONTHS.length; i++) {
                 entries.add(new Entry(i, (float) totalIncome));
             }
         }
@@ -268,7 +275,7 @@ public class MonthlyDashboardFragment extends Fragment {
                 }
             }
         } else {
-            for (int i =0; i < MONTHS.length; i++) {
+            for (int i = 0; i < MONTHS.length; i++) {
                 entries2.add(new Entry(0, (float) totalExpense));
             }
         }
@@ -322,7 +329,7 @@ public class MonthlyDashboardFragment extends Fragment {
                 }
             }
         } else {
-            for (int i =0; i < MONTHS.length; i++) {
+            for (int i = 0; i < MONTHS.length; i++) {
                 entries1.add(new BarEntry(0, (float) 0));
             }
         }
@@ -341,7 +348,7 @@ public class MonthlyDashboardFragment extends Fragment {
                 }
             }
         } else {
-            for (int i =0; i < MONTHS.length; i++) {
+            for (int i = 0; i < MONTHS.length; i++) {
                 entries2.add(new BarEntry(0, (float) 0));
             }
         }
@@ -421,5 +428,30 @@ public class MonthlyDashboardFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void deleteAllTestReport() {
+        monthlyDashboardRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                if (monthlyIncomeReportRealmResults != null) {
+                    RealmResults<MonthlyReport> testIncomeReport = monthlyIncomeReportRealmResults.where()
+                            .equalTo(MonthlyReport.YEAR, 0)
+                            .findAll();
+                    if (testIncomeReport != null) {
+                        testIncomeReport.deleteAllFromRealm();
+                    }
+                }
+
+                if (monthlyExpenseReportRealmResults != null) {
+                    RealmResults<MonthlyReport> testExpenseReport = monthlyExpenseReportRealmResults.where()
+                            .equalTo(MonthlyReport.YEAR, 0)
+                            .findAll();
+                    if (testExpenseReport != null) {
+                        testExpenseReport.deleteAllFromRealm();
+                    }
+                }
+            }
+        });
     }
 }
