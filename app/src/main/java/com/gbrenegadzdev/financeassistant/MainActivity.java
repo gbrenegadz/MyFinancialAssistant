@@ -16,6 +16,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
 import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
@@ -32,6 +37,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -55,6 +62,12 @@ public class MainActivity extends AppCompatActivity
     private TextView mTotalCashOnHand;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private LoginButton loginButton;
+
+    // Facebook Authentication
+    private CallbackManager callbackManager;
+    private static final String EMAIL = "email";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +75,12 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        callbackManager = CallbackManager.Factory.create();
+
         initUI();
         initListeners();
         setupDefaultCategories();
+        initFacebookButton();
     }
 
     private void initUI() {
@@ -90,6 +106,35 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void initFacebookButton() {
+
+        loginButton = findViewById(R.id.login_button);
+        loginButton.setReadPermissions(Collections.singletonList(EMAIL));
+        // If you are using in a fragment, call loginButton.setFragment(this);
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+                Log.d(TAG, "Login Success!!!");
+                Log.d(TAG, "Result : " + loginResult.toString());
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+                Log.d(TAG, "Login Cancelled!!!");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+                Log.d(TAG, "Login Failed!!!");
+            }
+        });
     }
 
     @Override
@@ -318,5 +363,12 @@ public class MainActivity extends AppCompatActivity
             return getResources().getStringArray(R.array.giving);
         }
         return null;
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

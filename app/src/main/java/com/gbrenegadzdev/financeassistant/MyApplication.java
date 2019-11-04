@@ -2,6 +2,8 @@ package com.gbrenegadzdev.financeassistant;
 
 import android.app.Application;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.gbrenegadzdev.financeassistant.models.realm.Migration;
 
 import io.realm.Realm;
@@ -24,5 +26,8 @@ public class MyApplication extends Application {
         Realm.setDefaultConfiguration(config);
 
         super.onCreate();
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
     }
 }

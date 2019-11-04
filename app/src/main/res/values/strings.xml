@@ -76,6 +76,12 @@
     <string name="failed_to_save">Failed to save</string>
     <string name="invalid_input">Invalid input</string>
 
+
+    <!--Facebook Authentication-->
+    <string name="facebook_app_id">401891194032697</string>
+    <string name="fb_login_protocol_scheme">fb401891194032697</string>
+
+
     <!-- Sync Preferences -->
     <!--<string name="sync_title">Sync email periodically</string>-->
     <!--<string name="attachment_title">Download incoming attachments</string>-->
