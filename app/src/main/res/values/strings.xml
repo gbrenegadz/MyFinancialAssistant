@@ -377,6 +377,14 @@
     <string name="income_updated">Income Updated</string>
     <string name="income_title">Income</string>
     <string name="income_added">Income Added</string>
+    <string name="signin">Sign-In</string>
+    <string name="welcome_to_app_name">Hi, I\'m going to be your financial assistant.</string>
+    <string name="welcome">Welcome !</string>
+    <string name="sign_in_opening_statement">From here on, I will be your Financial Assistant.</string>
+    <string name="hi_there">Hi there!</string>
+    <string name="to_continue">Sign-up/Login to continue.</string>
+    <string name="login">Login</string>
+    <string name="or">Or</string>
 
 
     <!--===============================================================================================-->

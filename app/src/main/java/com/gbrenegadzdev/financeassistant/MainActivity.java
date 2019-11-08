@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -37,7 +38,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
             public void onSuccess(LoginResult loginResult) {
                 // App code
                 Log.d(TAG, "Login Success!!!");
-                Log.d(TAG, "Result : " + loginResult.toString());
+                Log.d(TAG, "Result : " + loginResult.getAccessToken());
             }
 
             @Override
