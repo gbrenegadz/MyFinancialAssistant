@@ -102,18 +102,18 @@ android.applicationVariants.all { variant ->
             // Assigns the new version code to versionCodeOverride, which changes the version code
             // for only the output APK, not for the variant itself. Skipping this step simply
             // causes Gradle to use the value of variant.versionCode for the APK.
-            output.versionCodeOverride =1
-                    baseAbiVersionCode * 1000 + variant.versionCodecheckReleaseBuilds
+            output.versionCodeOverride = 1
+            baseAbiVersionCode * 1000 + variant.versionCodecheckReleaseBuilds
         }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.preference:preference:1.1.0-rc01'
+    implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     testImplementation 'junit:junit:4.12'
@@ -127,4 +127,10 @@ dependencies {
 
     implementation 'com.github.badoualy:datepicker-timeline:c6dcd05737'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // Facebook Signin/Signup
+    implementation 'com.facebook.android:facebook-android-sdk:5.8.0'
+
+//    // Rounded Bottom Sheet
+//    implementation 'com.github.Deishelon:RoundedBottomSheet:1.0.1'
 }
