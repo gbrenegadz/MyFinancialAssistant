@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primaryColor">#ff6d00</color>
-    <color name="primaryColorDark">#ff6d00</color>
+    <color name="primaryColorDark">#FFF</color>
     <color name="material500">#008577</color>
     <color name="material_500_2">#00574B</color>
     <color name="colorAccent">#E64A19</color>
@@ -9,8 +9,28 @@
     <color name="transparent">#00000000</color>
     <color name="colorAccent_2">#FFA726</color>
     <color name="colorError">#EF5350</color>
+    <color name="textColorPrimary">#434343</color>
+    <color name="textColorSecondary">#606060</color>
 
 
+    <!--  Transparent  -->
+    <color name="primaryColorTransparent">#1AFF6D00</color>
+    <color name="primaryColorTransparent30">#4DFF6D00</color>
+
+    <color name="material500Transparent">#0D008577</color>
+    <color name="material500Transparent20">#33008577</color>
+
+    <color name="colorErrorTransparent">#0DEF5350</color>
+    <color name="colorErrorTransparent20">#33EF5350</color>
+
+    <color name="md_blue_500Transparent">#0D2196F3</color>
+    <color name="md_blue_500Transparent20">#332196F3</color>
+
+    <color name="md_amber_500Transparent">#1AFFC107</color>
+    <color name="md_amber_500Transparent30">#4DFFC107</color>
+
+    <color name="md_deep_purple_500Transparent">#0D673AB7</color>
+    <color name="md_deep_purple_500Transparent20">#33673AB7</color>
 
     <!--reds-->
     <color name="md_red_50">#FFEBEE</color>

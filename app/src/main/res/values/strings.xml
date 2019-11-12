@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">My Financial Assistant</string>
+    <string name="app_name_short">MyFA</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -385,6 +386,15 @@
     <string name="to_continue">Sign-up/Login to continue.</string>
     <string name="login">Login</string>
     <string name="or">Or</string>
+    <string name="hello">Hello,</string>
+    <string name="gilbert">Gilbert</string>
+    <string name="welcome_back_message">Welcome back, Gilbert</string>
+    <string name="summary">Summary</string>
+    <string name="change_month">Change Month</string>
+    <string name="exccess_cash_on_hand_note">Note: Any excess Cash-on-Hand from previous month wll be automatically added into the current month.</string>
+    <string name="title_activity_sample">SampleActivity</string>
+    <string name="home">Home</string>
+    <string name="expenses">Expenses</string>
 
 
     <!--===============================================================================================-->

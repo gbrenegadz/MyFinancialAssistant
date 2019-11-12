@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -25,6 +27,7 @@ import com.facebook.login.widget.LoginButton;
 import com.gbrenegadzdev.financeassistant.activities.BudgetActivity;
 import com.gbrenegadzdev.financeassistant.activities.ExpenseActivity;
 import com.gbrenegadzdev.financeassistant.activities.IncomeActivity;
+import com.gbrenegadzdev.financeassistant.activities.SampleActivity;
 import com.gbrenegadzdev.financeassistant.activities.SettingsActivity;
 import com.gbrenegadzdev.financeassistant.activities.SetupCategoryActivity;
 import com.gbrenegadzdev.financeassistant.fragments.LifetimeDashboardFragment;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private LoginButton loginButton;
+    private Button mTest;
 
     // Facebook Authentication
     private CallbackManager callbackManager;
@@ -84,6 +88,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initUI() {
+        mTest = findViewById(R.id.button5);
         toolbar = findViewById(R.id.toolbar);
         drawer = findViewById(R.id.drawer_layout);
 
@@ -106,6 +111,15 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+        mTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, SampleActivity.class);
+                startActivity(intent);
+
+            }
+        });
     }
 
     private void initFacebookButton() {
