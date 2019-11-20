@@ -19,7 +19,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Check if Access token is active
         if (AccessToken.isCurrentAccessTokenActive()) {
             Log.d(TAG, "Logged In");
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             startActivity(intent);
             finish();
         } else {
