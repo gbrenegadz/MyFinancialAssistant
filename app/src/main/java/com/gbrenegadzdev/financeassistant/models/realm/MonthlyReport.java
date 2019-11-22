@@ -1,8 +1,8 @@
 package com.gbrenegadzdev.financeassistant.models.realm;
 
 import android.util.Log;
+import android.widget.TextView;
 
-import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 
 import java.util.Date;

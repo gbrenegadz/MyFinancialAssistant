@@ -402,6 +402,8 @@
     <string name="title_income">Income</string>
     <string name="title_expenses">Expenses</string>
     <string name="savings">Savings</string>
+    <string name="today">Today</string>
+    <string name="current_month">Current Month</string>
 
 
     <!--===============================================================================================-->
