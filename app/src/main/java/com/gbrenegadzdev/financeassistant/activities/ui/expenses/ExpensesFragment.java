@@ -1,4 +1,4 @@
-package com.gbrenegadzdev.financeassistant.activities.ui.notifications;
+package com.gbrenegadzdev.financeassistant.activities.ui.expenses;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,14 +15,14 @@ import androidx.lifecycle.ViewModelProviders;
 import com.gbrenegadzdev.financeassistant.R;
 
 
-public class NotificationsFragment extends Fragment {
+public class ExpensesFragment extends Fragment {
 
-    private NotificationsViewModel notificationsViewModel;
+    private ExpensesViewModel notificationsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         notificationsViewModel =
-                ViewModelProviders.of(this).get(NotificationsViewModel.class);
+                ViewModelProviders.of(this).get(ExpensesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
         final TextView textView = root.findViewById(R.id.text_notifications);
         notificationsViewModel.getText().observe(this, new Observer<String>() {

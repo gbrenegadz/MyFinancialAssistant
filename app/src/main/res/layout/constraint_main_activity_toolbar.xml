@@ -4,21 +4,24 @@
     android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/dp16"
-    android:paddingBottom="@dimen/dp16"
-    android:paddingStart="@dimen/dp32"
-    android:paddingLeft="@dimen/dp32"
-    android:paddingRight="@dimen/dp32"
-    android:paddingEnd="@dimen/dp32"
     android:background="@color/white">
 
+
     <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/home"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp52"
+        android:background="@color/white"
+        android:text="@string/title_expenses"
         android:textSize="@dimen/text_h5"
+        android:gravity="start|center"
         android:textStyle="bold"
         android:textColor="@color/primaryColor"
+        android:paddingStart="@dimen/dp24"
+        android:paddingLeft="@dimen/dp24"
+        android:paddingRight="@dimen/dp24"
+        android:paddingEnd="@dimen/dp24"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

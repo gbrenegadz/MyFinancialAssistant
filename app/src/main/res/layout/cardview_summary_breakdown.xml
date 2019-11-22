@@ -161,7 +161,7 @@
             android:layout_marginTop="4dp"
             android:background="@color/transparent"
             android:gravity="center"
-            android:text="@string/income"
+            android:text="@string/savings"
             android:textColor="@color/textColorPrimary"
             android:textSize="@dimen/text_overline"
             app:layout_constraintEnd_toEndOf="parent"

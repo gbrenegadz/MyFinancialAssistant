@@ -399,6 +399,9 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_income">Income</string>
+    <string name="title_expenses">Expenses</string>
+    <string name="savings">Savings</string>
 
 
     <!--===============================================================================================-->

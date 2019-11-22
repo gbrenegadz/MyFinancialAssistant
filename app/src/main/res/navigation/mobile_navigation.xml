@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
-
-    <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.gbrenegadzdev.financeassistant.activities.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+    app:startDestination="@+id/navigation_dashboard">
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.gbrenegadzdev.financeassistant.activities.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.gbrenegadzdev.financeassistant.activities.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:id="@+id/navigation_income"
+        android:name="com.gbrenegadzdev.financeassistant.activities.ui.income.IncomeFragment"
+        android:label="@string/title_income"
+        tools:layout="@layout/fragment_income" />
+
+    <fragment
+        android:id="@+id/navigation_expenses"
+        android:name="com.gbrenegadzdev.financeassistant.activities.ui.expenses.ExpensesFragment"
+        android:label="@string/title_expenses"
         tools:layout="@layout/fragment_notifications" />
 </navigation>

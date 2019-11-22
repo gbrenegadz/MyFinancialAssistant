@@ -18,7 +18,9 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.HomeActivity"
-            android:label="@string/title_activity_home"></activity>
+            android:label="@string/title_activity_home">
+
+        </activity>
         <activity
             android:name=".activities.SampleActivity"
             android:label="@string/title_activity_sample"

@@ -56,7 +56,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_top_income"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true"
+                        android:focusable="false"/>
                 </LinearLayout>
 
                 <!-- Top Savings -->
@@ -74,7 +77,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_top_savings"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true"
+                        android:focusable="false"/>
                 </LinearLayout>
 
                 <!-- Top Expenses -->
@@ -92,7 +98,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_top_expense"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true"
+                        android:focusable="false"/>
                 </LinearLayout>
 
                 <!-- Top Product Expenses -->
@@ -110,7 +119,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_top_product_expenses"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true"
+                        android:focusable="false"/>
                 </LinearLayout>
 
                 <!-- Top Store Expenses -->
@@ -128,7 +140,10 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_top_store_expenses"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="match_parent"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true"
+                        android:focusable="false"/>
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>
