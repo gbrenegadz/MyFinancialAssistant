@@ -312,6 +312,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
         if (selectedIncome != null) {
             if (action == INCOME_UPDATE) {
                 mNameAutoComplete.setText(selectedIncome.getIncomeName());
+                mSourceAutoComplete.setText(selectedIncome.getIncomeSource());
                 mValue.setText(stringUtils.getDecimal2(selectedIncome.getAmount()));
             }
         }
