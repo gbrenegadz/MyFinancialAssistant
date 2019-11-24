@@ -149,6 +149,12 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
             mDatePicketTimeline.setLastVisibleDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
             mDatePicketTimeline.setSelectedDate(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
             mDatePicketTimeline.centerOnSelection();
+            mDatePicketTimeline.setOnDateSelectedListener(new DatePickerTimeline.OnDateSelectedListener() {
+                @Override
+                public void onDateSelected(int year, int month, int day, int index) {
+                    queryIncomeSelectedDateAndMonth(year, month, day);
+                }
+            });
 
         }
     }
