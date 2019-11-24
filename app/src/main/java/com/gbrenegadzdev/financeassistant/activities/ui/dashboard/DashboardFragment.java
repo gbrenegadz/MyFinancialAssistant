@@ -1,13 +1,11 @@
 package com.gbrenegadzdev.financeassistant.activities.ui.dashboard;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -21,14 +19,12 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gbrenegadzdev.financeassistant.R;
-import com.gbrenegadzdev.financeassistant.models.realm.Income;
+import com.gbrenegadzdev.financeassistant.models.realm.MonthlyReport;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 
 import java.util.Date;
 
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -45,14 +41,18 @@ public class DashboardFragment extends Fragment {
     private int currentMonth, currentYear;
     private String currentMonthString;
 
+    private double totalMonthlyCashOnHand = 0.0;
+    private double totalMonthlyIncome = 0.0;
+    private double totalMonthlyExpense = 0.0;
+    private double totalMonthlySavings = 0.0;
+
     private DashboardViewModel homeViewModel;
     private FragmentActivity mFragmentActivity;
     private RecyclerView mTopIncomeRV, mTopExpenseRV, mTopSavingsRV, mTopProductExpenseRV, mTopStoreExpeseRV;
     private ScrollView mScrollView;
     private TextView mToolbarText;
 
-    private TextView mCurrentMonthSummary, mCurrentMonthIncome;
-    private ProgressBar mIncomeProgress;
+    private TextView mCurrentMonthSummary, mCurrentMonthIncome, mCurrentMonthExpense;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,12 +87,20 @@ public class DashboardFragment extends Fragment {
 
         initUI(view);
 
+
+        final RealmResults<MonthlyReport> monthlyReports = realm.where(MonthlyReport.class)
+                .findAll();
+        if (monthlyReports != null) {
+            Log.d(TAG, "Total Income Monthly : " + monthlyReports.sum(MonthlyReport.AMOUNT));
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
+//        queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
+        getMonthlyIncomeSummary();
+        getMonthlyExpenseSummary();
     }
 
     /**
@@ -114,17 +122,17 @@ public class DashboardFragment extends Fragment {
         if (mFragmentActivity != null) {
             // ScrollView
             mScrollView = view.findViewById(R.id.scrollView);
-            mScrollView.smoothScrollTo(0,0);
+            mScrollView.smoothScrollTo(0, 0);
 
             // Current Month Summary Label
             mCurrentMonthSummary = view.findViewById(R.id.txt_summary_label);
             mCurrentMonthSummary.setText(getString(R.string.summary).concat(": ").concat(currentMonthString));
 
-            // Current Month Income total amount
+            // Current Month Income Total Amount
             mCurrentMonthIncome = view.findViewById(R.id.txt_income);
 
-            // Income Progress
-            mIncomeProgress = view.findViewById(R.id.pb_income);
+            // Current Month Expense Total Amount
+            mCurrentMonthExpense = view.findViewById(R.id.txt_expenses);
 
             setupTabhost();
         }
@@ -175,39 +183,41 @@ public class DashboardFragment extends Fragment {
         mTopStoreExpeseRV.setFocusable(false);
     }
 
-    // Get Income for the current Month() {
-    private void queryIncomeSelectedMonth(int year, int month) {
-        // Init UI
-        mCurrentMonthIncome.setVisibility(View.GONE);
-        mIncomeProgress.setVisibility(View.VISIBLE);
 
-        Log.d(TAG, "Income this month : I'm in!!!");
-        final Date startDate = dateTimeUtils.getDate(year, month + 1, 1, 0, 0, 0);
-        final Date endDate = dateTimeUtils.getDate(year, month + 1, dateTimeUtils.getLastDayOfMonth(year, month), 23, 59, 59);
-        Log.d(TAG, "Start Month Date : " + startDate + "\tEnd Month Date : " + endDate);
+    /**=============================================================================================
+     * Query Monthly INCOME Summary and display Amount
+     =============================================================================================*/
+    private void getMonthlyIncomeSummary() {
+        final MonthlyReport incomeMonthlyReport = realm.where(MonthlyReport.class)
+                .equalTo(MonthlyReport.MONTH, dateTimeUtils.getStringMonth(currentDate))
+                .equalTo(MonthlyReport.YEAR, dateTimeUtils.getIntYear(currentDate))
+                .equalTo(MonthlyReport.REPORT_TYPE, MonthlyReport.REPORT_TYPE_INCOME)
+                .findFirst();
+        if (incomeMonthlyReport != null) {
+            totalMonthlyIncome = incomeMonthlyReport.getAmount();
 
-        final RealmResults<Income> incomeCurrentMonthRealmResults = realm.where(Income.class)
-                .greaterThan(Income.CREATED_DATETIME, startDate)
-                .lessThanOrEqualTo(Income.CREATED_DATETIME, endDate)
-                .findAllAsync();
-        incomeCurrentMonthRealmResults.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Income>>() {
-            @Override
-            public void onChange(RealmResults<Income> incomes, OrderedCollectionChangeSet changeSet) {
-                if (changeSet.isCompleteResult() && incomes.isLoaded()) {
-                    if (!incomes.isEmpty()) {
-                        final double amount = (double) incomeCurrentMonthRealmResults.sum(Income.AMOUNT);
-                        Log.e(TAG, "Current Month != null => Amount : " + amount);
-                        mCurrentMonthIncome.setText(stringUtils.getDecimal2(amount));
-                    } else {
-                        Log.e(TAG, "Current Month == null");
-                        mCurrentMonthIncome.setText(stringUtils.getDecimal2(0.0));
-                    }
+            // Update UI
+            mCurrentMonthIncome.setVisibility(View.VISIBLE);
+            mCurrentMonthIncome.setText(stringUtils.getDecimal2(totalMonthlyIncome));
+        }
+    }
 
-                    // Update UI
-                    mCurrentMonthIncome.setVisibility(View.VISIBLE);
-                    mIncomeProgress.setVisibility(View.GONE);
-                }
-            }
-        });
+
+    /**=============================================================================================
+     * Query Monthly EXPENSE Summary and display Amount
+     =============================================================================================*/
+    private void getMonthlyExpenseSummary() {
+        final MonthlyReport expenseMonthlyReport = realm.where(MonthlyReport.class)
+                .equalTo(MonthlyReport.MONTH, dateTimeUtils.getStringMonth(currentDate))
+                .equalTo(MonthlyReport.YEAR, dateTimeUtils.getIntYear(currentDate))
+                .equalTo(MonthlyReport.REPORT_TYPE, MonthlyReport.REPORT_TYPE_EXPENSE)
+                .findFirst();
+        if (expenseMonthlyReport != null) {
+            totalMonthlyExpense = expenseMonthlyReport.getAmount();
+
+            // Update UI
+            mCurrentMonthExpense.setVisibility(View.VISIBLE);
+            mCurrentMonthExpense.setText(stringUtils.getDecimal2(totalMonthlyIncome));
+        }
     }
 }
