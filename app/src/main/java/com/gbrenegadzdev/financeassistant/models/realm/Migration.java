@@ -99,6 +99,15 @@ public class Migration implements RealmMigration {
                 monthlyReportSchema.addField(MonthlyReport.AMOUNT, double.class);
                 monthlyReportSchema.addField(MonthlyReport.CREATED_DATETIME, Date.class);
             }
+
+            oldVersion++;
+        }
+
+        if (oldVersion == 1) {
+            RealmObjectSchema incomeSchema = schema.get(Income.class.getSimpleName());
+            if (incomeSchema != null) {
+                incomeSchema.addField(Income.INCOME_SOURCE, String.class);
+            }
         }
     }
 }

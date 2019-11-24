@@ -50,6 +50,7 @@ public class IncomeRecyclerViewAdapter extends RealmRecyclerViewAdapter<Income, 
             if (income != null) {
                 final StringUtils stringUtils = new StringUtils();
                 viewHolder.mIncomeName.setText(income.getIncomeName());
+                viewHolder.mIncomeSource.setText(income.getIncomeSource());
                 viewHolder.mIncomeAmount.setText(stringUtils.getDecimal2(income.getAmount()));
 
                 viewHolder.mUpdate.setOnClickListener(new View.OnClickListener() {
@@ -75,13 +76,14 @@ public class IncomeRecyclerViewAdapter extends RealmRecyclerViewAdapter<Income, 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView mIncomeName;
-        private TextView mIncomeAmount;
+        private TextView mIncomeAmount, mIncomeSource;
         private ImageButton mDelete;
         private ImageButton mUpdate;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             mIncomeName = itemView.findViewById(R.id.txt_income_name);
             mIncomeAmount = itemView.findViewById(R.id.txt_income_amount);
+            mIncomeSource = itemView.findViewById(R.id.txt_source);
             mDelete = itemView.findViewById(R.id.ibtn_delete);
             mUpdate = itemView.findViewById(R.id.ibtn_update);
         }

@@ -264,8 +264,8 @@ public class ExpenseActivity extends AppCompatActivity {
     private void showAddUpdateExpenseDialog(final View view, final int action, RealmObject realmObject) {
         LayoutInflater inflater = getLayoutInflater();
         View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_add_label_and_value, null);
-        final TextInputLayout mPaidToCont = mAlertDialogCustomerView.findViewById(R.id.til_paid_to_auto_complete);
-        final AppCompatAutoCompleteTextView mPaidTo = mAlertDialogCustomerView.findViewById(R.id.et_paid_to_auto_complete);
+        final TextInputLayout mPaidToCont = mAlertDialogCustomerView.findViewById(R.id.til_paid_to_or_source_auto_complete);
+        final AppCompatAutoCompleteTextView mPaidTo = mAlertDialogCustomerView.findViewById(R.id.et_paid_to_or_source_auto_complete);
         final AppCompatAutoCompleteTextView mNameAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 

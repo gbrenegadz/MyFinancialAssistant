@@ -36,6 +36,7 @@ import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;
 import com.gbrenegadzdev.financeassistant.utils.StringUtils;
 import com.github.badoualy.datepicker.DatePickerTimeline;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 import java.util.UUID;
@@ -287,11 +288,17 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
         LayoutInflater inflater = getLayoutInflater();
         View mAlertDialogCustomerView = inflater.inflate(R.layout.constraint_dialog_add_label_and_value, null);
         final AppCompatAutoCompleteTextView mNameAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_name_auto_complete);
+        final TextInputLayout mSourceCont = mAlertDialogCustomerView.findViewById(R.id.til_paid_to_or_source_auto_complete);
+        final AppCompatAutoCompleteTextView mSourceAutoComplete = mAlertDialogCustomerView.findViewById(R.id.et_paid_to_or_source_auto_complete);
         final TextInputEditText mValue = mAlertDialogCustomerView.findViewById(R.id.et_value);
 
 
-        Log.d(TAG, "autoCompleteIncome : " + autoCompleteIncome.length);
+        // Show Source text view since it is initially hidden
+        mSourceCont.setVisibility(View.VISIBLE);
+        mSourceCont.setHint(getString(R.string.source));
 
+        // Get the strings that will be used for auto complete for income
+        Log.d(TAG, "autoCompleteIncome : " + autoCompleteIncome.length);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
                 (mFragmentActivity, android.R.layout.simple_list_item_1, autoCompleteIncome);
         mNameAutoComplete.setThreshold(1); //will start working from first character
@@ -315,7 +322,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialogInterface, int i) {
-                        saveNewIncome(view, mNameAutoComplete, mValue, action, dialogInterface, selectedIncome);
+                        saveNewIncome(view, mNameAutoComplete, mSourceAutoComplete, mValue, action, dialogInterface, selectedIncome);
                     }
                 },
                 new DialogInterface.OnClickListener() {
@@ -362,7 +369,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
     /**============================================================================================
      * Save Income
      ============================================================================================*/
-    private void saveNewIncome(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, TextInputEditText mValue, final int action, final DialogInterface dialogInterface, final Income selectedIncome) {
+    private void saveNewIncome(final View view, AppCompatAutoCompleteTextView mNameAutoComplete, AppCompatAutoCompleteTextView mSourceAutoComplete, TextInputEditText mValue, final int action, final DialogInterface dialogInterface, final Income selectedIncome) {
         boolean isValidatedInput = true;
         if (mNameAutoComplete.getText() != null) {
             Log.e(TAG, "mNameAutoComplete.getText() is not null");
@@ -374,6 +381,19 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
         } else {
             Log.e(TAG, "mNameAutoComplete.getText() null");
             mNameAutoComplete.setError(getString(R.string.required));
+            isValidatedInput = false;
+        }
+
+        if (mSourceAutoComplete.getText() != null) {
+            Log.e(TAG, "mSourceAutoComplete.getText() is not null");
+            if (TextUtils.isEmpty(mSourceAutoComplete.getText().toString())) {
+                Log.e(TAG, "mSourceAutoComplete.getText().toString() null");
+                mSourceAutoComplete.setError(getString(R.string.required));
+                isValidatedInput = false;
+            }
+        } else {
+            Log.e(TAG, "mSourceAutoComplete.getText() null");
+            mSourceAutoComplete.setError(getString(R.string.required));
             isValidatedInput = false;
         }
 
@@ -393,6 +413,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
 
         if (isValidatedInput) {
             final String finalName = mNameAutoComplete.getText().toString();
+            final String finalSource = mSourceAutoComplete.getText().toString();
             final String finalValue = mValue.getText().toString();
 
             if (action == INCOME_ADD) {
@@ -409,6 +430,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                             final Income newIncome = new Income();
                             newIncome.setIncomeId(UUID.randomUUID().toString());
                             newIncome.setIncomeName(finalName);
+                            newIncome.setIncomeSource(finalSource);
                             newIncome.setAmount(amount);
                             newIncome.setMonth(stringMonth);
                             newIncome.setYear(intYear);
@@ -459,19 +481,6 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                                         }
                                     }).show();
                         } finally {
-//                            mFragmentActivity.runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    if (mAdapter.getItemCount() == 0) {
-//                                        queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-//                                    } else {
-//                                        mAdapter.notifyDataSetChanged();
-//                                        queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-//                                    }
-////                                    updateSubtitle(mAdapter.getItemCount());
-//                                    dialogInterface.dismiss();
-//                                }
-//                            });
                         }
                     }
                 });
@@ -550,14 +559,6 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                                         }
                                     }).show();
                         } finally {
-//                            if (mAdapter.getItemCount() == 0) {
-//                                queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-//                            } else {
-//                                mAdapter.notifyDataSetChanged();
-//                                queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-//                            }
-////                            updateSubtitle(mAdapter.getItemCount());
-//                            dialogInterface.dismiss();
                         }
                     }
                 });

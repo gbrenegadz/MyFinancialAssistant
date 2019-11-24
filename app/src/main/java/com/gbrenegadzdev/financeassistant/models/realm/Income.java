@@ -8,6 +8,7 @@ import io.realm.annotations.PrimaryKey;
 public class Income extends RealmObject {
     public static final String INCOME_ID = "incomeId";
     public static final String INCOME_NAME = "incomeName";
+    public static final String INCOME_SOURCE = "incomeSource";
     public static final String AMOUNT = "amount";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
@@ -17,6 +18,7 @@ public class Income extends RealmObject {
     @PrimaryKey
     private String incomeId;
     private String incomeName;
+    private String incomeSource;
     private double amount;
     private String month;
     private int year;
@@ -37,6 +39,14 @@ public class Income extends RealmObject {
 
     public void setIncomeName(String incomeName) {
         this.incomeName = incomeName;
+    }
+
+    public String getIncomeSource() {
+        return incomeSource;
+    }
+
+    public void setIncomeSource(String incomeSource) {
+        this.incomeSource = incomeSource;
     }
 
     public double getAmount() {
@@ -84,6 +94,7 @@ public class Income extends RealmObject {
         return "Income{" +
                 "incomeId='" + incomeId + '\'' +
                 ", incomeName='" + incomeName + '\'' +
+                ", incomeSource='" + incomeSource + '\'' +
                 ", amount=" + amount +
                 ", month='" + month + '\'' +
                 ", year=" + year +

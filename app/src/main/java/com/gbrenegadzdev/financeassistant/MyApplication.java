@@ -18,8 +18,7 @@ public class MyApplication extends Application {
         // The Realm file will be located in Context.getFilesDir() with name "myrealm.realm"
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .name("myassistant.realm")
-                .schemaVersion(42)
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .migration(new Migration())
                 .build();
         // Use the config
