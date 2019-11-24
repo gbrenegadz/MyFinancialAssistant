@@ -16,6 +16,13 @@ import io.realm.exceptions.RealmException;
 public class MonthlyReport extends RealmObject {
     private static final String TAG = MonthlyReport.class.getSimpleName();
 
+    public static final int REPORT_TYPE_INCOME = 1;
+    public static final int REPORT_TYPE_EXPENSE = 2;
+    public static final int REPORT_TYPE_TOP_INCOME = 3;
+    public static final int REPORT_TYPE_TOP_EXPENSE = 4;
+    public static final int REPORT_TYPE_TOP_PRODUCT = 5;
+    public static final int REPORT_TYPE_TOP_ENTITY_SPENT_TO = 6;
+
     public static final String MONTHLY_REPORT_ID = "monthlyReportId";
     public static final String REPORT_TYPE = "reportType";
     public static final String YEAR = "year";

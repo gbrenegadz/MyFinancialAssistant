@@ -367,7 +367,7 @@ public class ExpenseActivity extends AppCompatActivity {
 
                             // Update the value of Monthly Report
                             // Just Add the value
-                            new MonthlyReport(Constants.REPORT_TYPE_EXPENSE, intYear, stringMonth, amount)
+                            new MonthlyReport(MonthlyReport.REPORT_TYPE_EXPENSE, intYear, stringMonth, amount)
                                     .addUpdateAmount();
 
                             // Show Snackbar notification
@@ -445,7 +445,7 @@ public class ExpenseActivity extends AppCompatActivity {
 
                             // Update the value of Monthly Report
                             // Just Add the value
-                            new MonthlyReport(Constants.REPORT_TYPE_EXPENSE, intYear, stringMonth, diff)
+                            new MonthlyReport(MonthlyReport.REPORT_TYPE_EXPENSE, intYear, stringMonth, diff)
                                     .addUpdateAmount();
 
 

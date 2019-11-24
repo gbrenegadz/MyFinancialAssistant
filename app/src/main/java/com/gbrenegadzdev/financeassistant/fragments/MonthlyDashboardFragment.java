@@ -113,7 +113,7 @@ public class MonthlyDashboardFragment extends Fragment {
 
     private void getIncome() {
         monthlyIncomeReportRealmResults = monthlyDashboardRealm.where(MonthlyReport.class)
-                .equalTo(MonthlyReport.REPORT_TYPE, Constants.REPORT_TYPE_INCOME)
+                .equalTo(MonthlyReport.REPORT_TYPE, MonthlyReport.REPORT_TYPE_INCOME)
                 .findAll();
         if (monthlyIncomeReportRealmResults != null) {
             for (MonthlyReport incomeReport : monthlyIncomeReportRealmResults) {
@@ -124,7 +124,7 @@ public class MonthlyDashboardFragment extends Fragment {
 
     private void getExpense() {
         monthlyExpenseReportRealmResults = monthlyDashboardRealm.where(MonthlyReport.class)
-                .equalTo(MonthlyReport.REPORT_TYPE, Constants.REPORT_TYPE_EXPENSE)
+                .equalTo(MonthlyReport.REPORT_TYPE, MonthlyReport.REPORT_TYPE_EXPENSE)
                 .findAll();
         if (monthlyExpenseReportRealmResults != null) {
             for (MonthlyReport expenseReport : monthlyExpenseReportRealmResults) {
@@ -396,7 +396,7 @@ public class MonthlyDashboardFragment extends Fragment {
 
                         final MonthlyReport newMonthlyReport = new MonthlyReport();
                         newMonthlyReport.setMonthlyReportId(UUID.randomUUID().toString());
-                        newMonthlyReport.setReportType(Constants.REPORT_TYPE_INCOME);
+                        newMonthlyReport.setReportType(MonthlyReport.REPORT_TYPE_INCOME);
                         newMonthlyReport.setMonth(MONTHS[i]);
                         newMonthlyReport.setAmount(amount);
                         newMonthlyReport.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());
@@ -418,7 +418,7 @@ public class MonthlyDashboardFragment extends Fragment {
 
                         final MonthlyReport newMonthlyReport = new MonthlyReport();
                         newMonthlyReport.setMonthlyReportId(UUID.randomUUID().toString());
-                        newMonthlyReport.setReportType(Constants.REPORT_TYPE_EXPENSE);
+                        newMonthlyReport.setReportType(MonthlyReport.REPORT_TYPE_EXPENSE);
                         newMonthlyReport.setMonth(MONTHS[i]);
                         newMonthlyReport.setAmount(amount);
                         newMonthlyReport.setCreatedDatetime(dateTimeUtils.getCurrentDatetime());

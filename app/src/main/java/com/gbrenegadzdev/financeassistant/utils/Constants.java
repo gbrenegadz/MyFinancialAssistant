@@ -29,11 +29,4 @@ public class Constants {
     public static final int REQUEST_CODE_BUDGET = 3;
     public static final int REQUEST_CODE_CATEGORY = 4;
     public static final int REQUEST_CODE_SETTINGS = 5;
-
-    public static final int REPORT_TYPE_INCOME = 1;
-    public static final int REPORT_TYPE_EXPENSE = 2;
-    public static final int REPORT_TYPE_TOP_INCOME = 3;
-    public static final int REPORT_TYPE_TOP_EXPENSE = 4;
-    public static final int REPORT_TYPE_TOP_PRODUCT = 5;
-    public static final int REPORT_TYPE_TOP_ENTITY_SPENT_TO = 6;
 }

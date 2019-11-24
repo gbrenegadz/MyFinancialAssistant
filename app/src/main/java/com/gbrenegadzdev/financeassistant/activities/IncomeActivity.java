@@ -332,7 +332,7 @@ public class IncomeActivity extends AppCompatActivity {
 
                             // Update the value of Monthly Report
                             // Just Add the value
-                            new MonthlyReport(Constants.REPORT_TYPE_INCOME, intYear, stringMonth, amount)
+                            new MonthlyReport(MonthlyReport.REPORT_TYPE_INCOME, intYear, stringMonth, amount)
                                     .addUpdateAmount();
 
                             Log.d(TAG, "New Income : " + newIncome.toString());
@@ -411,7 +411,7 @@ public class IncomeActivity extends AppCompatActivity {
 
                             // Update the value of Monthly Report
                             // Just Add the value
-                            new MonthlyReport(Constants.REPORT_TYPE_INCOME, intYear, stringMonth, diff)
+                            new MonthlyReport(MonthlyReport.REPORT_TYPE_INCOME, intYear, stringMonth, diff)
                                     .addUpdateAmount();
 
 
