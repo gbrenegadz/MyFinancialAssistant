@@ -28,7 +28,7 @@ public class DateTimeUtils {
         int month = cal.get(Calendar.MONTH); // 0 being January
         int year = cal.get(Calendar.YEAR);
 
-        return new DateFormatSymbols().getMonths()[month-1];
+        return new DateFormatSymbols().getMonths()[month];
     }
 
     public int getIntMonth(Date date) {
@@ -84,5 +84,11 @@ public class DateTimeUtils {
         cal.set(Calendar.MONTH, month);
 
         return cal.getActualMaximum(Calendar.DATE);
+    }
+
+    public String convertDateMMMdd(Date date) {
+        final String currentMonth = getStringMonth(date);
+        final int dayOfMonth = getIntDayOfMonth(date);
+        return currentMonth.concat(" ").concat(String.valueOf(dayOfMonth));
     }
 }

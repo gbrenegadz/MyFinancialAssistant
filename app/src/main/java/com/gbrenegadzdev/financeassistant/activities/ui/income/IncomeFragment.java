@@ -71,7 +71,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private DatePickerTimeline mDatePicketTimeline;
-    private TextView mTotalAmount, mTotalMonth, mTotalToday;
+    private TextView mTotalTodayLabel, mTotalCurrentMonthLabel, mTotalMonth, mTotalToday;
 
     private String[] autoCompleteIncome;
     private int selectedMonth = 0;
@@ -141,7 +141,8 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
             mAdd.setOnClickListener(this);
 
             mRecyclerView = view.findViewById(R.id.recycler_view);
-            mTotalAmount = view.findViewById(R.id.txt_total_amount);
+            mTotalTodayLabel = view.findViewById(R.id.txt_total_today_label);
+            mTotalCurrentMonthLabel = view.findViewById(R.id.txt_total_month_label);
             mTotalMonth = view.findViewById(R.id.txt_total_month);
             mTotalToday = view.findViewById(R.id.txt_total_today);
 
@@ -195,14 +196,10 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
         // Query all income and total amount for selected date
         queryIncomeSelectedDate(year, month, day);
 
-        // Get Total Amount for the month
-        if (selectedMonth != (month + 1)) {
-            selectedMonth = month;
-            Log.e(TAG, "Selected Month : " + selectedMonth);
-            queryIncomeSelectedMonth(year, month);
-        } else {
-            Log.e(TAG, "Selected Month : " + selectedMonth);
-        }
+        // Query all income and total amount for selected month
+        selectedMonth = month;
+        Log.e(TAG, "Selected Month : " + selectedMonth);
+        queryIncomeSelectedMonth(year, month);
     }
 
     private void queryIncomeSelectedDate(int year, int month, int day) {
@@ -218,6 +215,12 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
         if (incomeTodayRealmResults != null) {
             populateIncomeList(incomeTodayRealmResults);
         }
+
+        // Change the Date label
+        mTotalTodayLabel.setText(dateTimeUtils.convertDateMMMdd(startDate));
+
+        // Update the current month label
+        mTotalCurrentMonthLabel.setText(dateTimeUtils.getStringMonth(startDate));
     }
 
     private void queryIncomeSelectedMonth(int year, int month) {
