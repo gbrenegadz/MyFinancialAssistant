@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -62,7 +63,8 @@ public class LoginActivity extends AppCompatActivity {
                 // App code
                 Log.d(TAG, "Login Success!!!");
                 Log.d(TAG, "Result : " + loginResult.getAccessToken());
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
             }
 

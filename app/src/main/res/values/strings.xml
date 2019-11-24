@@ -405,6 +405,7 @@
     <string name="today">Today</string>
     <string name="current_month">Current Month</string>
     <string name="source">Source</string>
+    <string name="login_success">Login Success</string>
 
 
     <!--===============================================================================================-->
