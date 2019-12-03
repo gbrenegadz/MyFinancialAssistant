@@ -29,7 +29,6 @@ import com.gbrenegadzdev.financeassistant.adapters.IncomeRecyclerViewAdapter;
 import com.gbrenegadzdev.financeassistant.interfaces.ClickListener;
 import com.gbrenegadzdev.financeassistant.models.realm.Income;
 import com.gbrenegadzdev.financeassistant.models.realm.MonthlyReport;
-import com.gbrenegadzdev.financeassistant.utils.Constants;
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 import com.gbrenegadzdev.financeassistant.utils.DialogUtils;
 import com.gbrenegadzdev.financeassistant.utils.SnackbarUtils;

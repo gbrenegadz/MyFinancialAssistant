@@ -7,25 +7,161 @@
     tools:context=".activities.ExpenseActivity">
 
     <include
+        android:id="@+id/include"
+        layout="@layout/constraint_main_activity_toolbar" />
+
+    <include
         layout="@layout/content_expense"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_add"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:background="@color/md_grey_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_add"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_add">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+
+            <TextView
+                android:id="@+id/txt_total_today"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="4dp"
+                android:autoSizeMaxTextSize="100sp"
+                android:autoSizeMinTextSize="10sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp4"
+                android:paddingLeft="@dimen/dp4"
+                android:paddingEnd="@dimen/dp4"
+                android:paddingRight="@dimen/dp4"
+                android:text="@string/zero"
+                android:textColor="@color/material500"
+                android:textSize="@dimen/text_h6"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/txt_total_today_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/txt_total_today_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp4"
+                android:paddingLeft="@dimen/dp4"
+                android:paddingEnd="@dimen/dp4"
+                android:paddingRight="@dimen/dp4"
+                android:text="@string/today"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="@dimen/text_overline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/txt_total_month"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="4dp"
+                android:autoSizeMaxTextSize="100sp"
+                android:autoSizeMinTextSize="10sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp4"
+                android:paddingLeft="@dimen/dp4"
+                android:paddingEnd="@dimen/dp4"
+                android:paddingRight="@dimen/dp4"
+                android:text="@string/zero"
+                android:textColor="@color/material500"
+                android:textSize="@dimen/text_h6"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/txt_total_month_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/txt_total_month_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp4"
+                android:paddingLeft="@dimen/dp4"
+                android:paddingEnd="@dimen/dp4"
+                android:paddingRight="@dimen/dp4"
+                android:text="@string/current_month"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="@dimen/text_overline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/txt_total_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dp28"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="4dp"
+            android:autoSizeMaxTextSize="100sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
+            android:gravity="start|center"
+            android:paddingStart="@dimen/dp2"
+            android:paddingLeft="@dimen/dp2"
+            android:paddingEnd="@dimen/dp2"
+            android:paddingRight="@dimen/dp2"
+            android:text="@string/zero"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/text_h6"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/date_picket_time_line"
+            tools:targetApi="o" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_add"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/dp150"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:background="@color/colorAccent"
+        android:background="@color/primaryColor"
         android:clickable="true"
         android:focusable="true"
         android:text="@string/add"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintCircleRadius="@dimen/dp4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
