@@ -604,9 +604,6 @@ public class ExpensesFragment extends Fragment implements View.OnClickListener {
                                 public void execute(Realm realm) {
                                     forDeleteExpense.deleteFromRealm();
 
-                                    // Update Expense List and Amount
-                                    queryExpenseSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-
                                     // Show Snackbar notification
                                     snackbarUtils.create(view,
                                             getString(R.string.expense_deleted).concat(" \"").concat(incomeName).concat("\""),
@@ -618,6 +615,9 @@ public class ExpensesFragment extends Fragment implements View.OnClickListener {
                                             }).show();
                                 }
                             });
+
+                            // Update Expense List and Amount
+                            queryExpenseSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
                         }
                     }).show();
         }

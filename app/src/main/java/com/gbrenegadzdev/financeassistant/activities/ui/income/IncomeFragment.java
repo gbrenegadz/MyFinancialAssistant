@@ -348,7 +348,6 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                                 @Override
                                 public void execute(Realm realm) {
                                     forDeleteIncome.deleteFromRealm();
-                                    mAdapter.notifyDataSetChanged();
 
                                     // Show Snackbar notification
                                     snackbarUtils.create(view,
@@ -361,6 +360,9 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                                             }).show();
                                 }
                             });
+
+                            // Update Expense List and Amount
+                            queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
                         }
                     }).show();
         }
@@ -487,15 +489,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
 
 
                 // Update Monthly Total Amount
-                if (mAdapter.getItemCount() == 0) {
-                    Log.e(TAG, "Update total Amount == 0");
-                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-                } else {
-                    Log.e(TAG, "Update total Amount != 0");
-                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-                    mAdapter.notifyDataSetChanged();
-                }
-//                                    updateSubtitle(mAdapter.getItemCount());
+                queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
                 dialogInterface.dismiss();
             } else if (action == INCOME_UPDATE) {
                 realm.executeTransaction(new Realm.Transaction() {
@@ -564,15 +558,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
                 });
 
                 // Update Monthly Total Amount
-                if (mAdapter.getItemCount() == 0) {
-                    Log.e(TAG, "Update total Amount == 0");
-                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-                } else {
-                    Log.e(TAG, "Update total Amount != 0");
-                    queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
-                    mAdapter.notifyDataSetChanged();
-                }
-//                            updateSubtitle(mAdapter.getItemCount());
+                queryIncomeSelectedDateAndMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate), dateTimeUtils.getIntDayOfMonth(currentDate));
                 dialogInterface.dismiss();
             }
         } else {
