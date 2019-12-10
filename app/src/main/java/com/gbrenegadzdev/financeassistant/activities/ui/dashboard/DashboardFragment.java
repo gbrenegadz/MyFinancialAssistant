@@ -27,6 +27,7 @@ import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmException;
 
 
 public class DashboardFragment extends Fragment {
@@ -41,7 +42,7 @@ public class DashboardFragment extends Fragment {
     private int currentMonth, currentYear;
     private String currentMonthString;
 
-    private double totalMonthlyCashOnHand = 0.0;
+    private double totalCashOnHand = 0.0;
     private double totalMonthlyIncome = 0.0;
     private double totalMonthlyExpense = 0.0;
     private double totalMonthlySavings = 0.0;
@@ -52,7 +53,7 @@ public class DashboardFragment extends Fragment {
     private ScrollView mScrollView;
     private TextView mToolbarText;
 
-    private TextView mCurrentMonthSummary, mCurrentMonthIncome, mCurrentMonthExpense;
+    private TextView mCurrentMonthSummary, mCurrentMonthIncome, mCurrentMonthExpense, mCashOnHand;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -101,6 +102,21 @@ public class DashboardFragment extends Fragment {
 //        queryIncomeSelectedMonth(dateTimeUtils.getIntYear(currentDate), dateTimeUtils.getIntMonth(currentDate));
         getMonthlyIncomeSummary();
         getMonthlyExpenseSummary();
+        getCashOnHand();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            realm.close();
+        } catch (RealmException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Realm Exception Error : " + e.getMessage() + "\nCaused By : " + e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Exception Error : " + e.getMessage() + "\nCaused By : " + e.getCause());
+        }
     }
 
     /**
@@ -133,6 +149,9 @@ public class DashboardFragment extends Fragment {
 
             // Current Month Expense Total Amount
             mCurrentMonthExpense = view.findViewById(R.id.txt_expenses);
+
+            // Running Cash-on-Hand
+            mCashOnHand = view.findViewById(R.id.txt_cash_on_hand);
 
             setupTabhost();
         }
@@ -220,5 +239,13 @@ public class DashboardFragment extends Fragment {
             mCurrentMonthExpense.setVisibility(View.VISIBLE);
             mCurrentMonthExpense.setText(stringUtils.getDecimal2(totalMonthlyExpense));
         }
+    }
+
+    /**=============================================================================================
+     * Query Monthly EXPENSE Summary and display Amount
+     =============================================================================================*/
+    private void getCashOnHand() {
+        totalCashOnHand = totalMonthlyIncome - totalMonthlyExpense;
+        mCashOnHand.setText(stringUtils.getDecimal2(totalCashOnHand));
     }
 }
