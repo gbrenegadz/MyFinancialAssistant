@@ -65,7 +65,7 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
     private RealmResults<Income> incomeRealmResults;
 
     private FragmentActivity mFragmentActivity;
-    private IncomeViewModel dashboardViewModel;
+    private IncomeViewModel incomeViewModel;
     private TextView mToolbarText;
     private Button mAdd;
     private RecyclerView mRecyclerView;
@@ -86,11 +86,11 @@ public class IncomeFragment extends Fragment implements View.OnClickListener {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
+        incomeViewModel =
                 ViewModelProviders.of(this).get(IncomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_income, container, false);
         mToolbarText = root.findViewById(R.id.toolbar);
-        dashboardViewModel.getText().observe(this, new Observer<String>() {
+        incomeViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 mToolbarText.setText(getString(R.string.menu_income));

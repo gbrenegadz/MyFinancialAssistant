@@ -47,7 +47,7 @@ public class DashboardFragment extends Fragment {
     private double totalMonthlyExpense = 0.0;
     private double totalMonthlySavings = 0.0;
 
-    private DashboardViewModel homeViewModel;
+    private DashboardViewModel dashboardViewModel;
     private FragmentActivity mFragmentActivity;
     private RecyclerView mTopIncomeRV, mTopExpenseRV, mTopSavingsRV, mTopProductExpenseRV, mTopStoreExpeseRV;
     private ScrollView mScrollView;
@@ -64,12 +64,12 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
+        dashboardViewModel =
                 ViewModelProviders.of(this).get(DashboardViewModel.class);
         View root = inflater.inflate(R.layout.constraint_main_activity, container, false);
 
         mToolbarText = root.findViewById(R.id.toolbar);
-        homeViewModel.getText().observe(this, new Observer<String>() {
+        dashboardViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 mToolbarText.setText(getString(R.string.menu_dashboard));

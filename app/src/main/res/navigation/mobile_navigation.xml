@@ -21,5 +21,13 @@
         android:id="@+id/navigation_expenses"
         android:name="com.gbrenegadzdev.financeassistant.activities.ui.expenses.ExpensesFragment"
         android:label="@string/title_expenses"
-        tools:layout="@layout/fragment_expense" />
+        tools:layout="@layout/fragment_expense" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_savings"
+        android:name="com.gbrenegadzdev.financeassistant.activities.ui.savings.SavingsFragment"
+        android:label="@string/title_savings"
+        tools:layout="@layout/fragment_savings" >
+    </fragment>
 </navigation>

@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_action_expense"
         android:title="@string/title_expenses" />
 
+    <item
+        android:id="@+id/navigation_savings"
+        android:icon="@drawable/ic_action_savings"
+        android:title="@string/title_savings" />
+
 </menu>
