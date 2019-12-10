@@ -214,10 +214,11 @@ public class DashboardFragment extends Fragment {
                 .findFirst();
         if (expenseMonthlyReport != null) {
             totalMonthlyExpense = expenseMonthlyReport.getAmount();
+            Log.d(TAG, "Total Monthly Expenses : " + totalMonthlyExpense);
 
             // Update UI
             mCurrentMonthExpense.setVisibility(View.VISIBLE);
-            mCurrentMonthExpense.setText(stringUtils.getDecimal2(totalMonthlyIncome));
+            mCurrentMonthExpense.setText(stringUtils.getDecimal2(totalMonthlyExpense));
         }
     }
 }

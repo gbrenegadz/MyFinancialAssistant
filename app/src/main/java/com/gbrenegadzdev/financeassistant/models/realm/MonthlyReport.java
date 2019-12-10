@@ -1,7 +1,6 @@
 package com.gbrenegadzdev.financeassistant.models.realm;
 
 import android.util.Log;
-import android.widget.TextView;
 
 import com.gbrenegadzdev.financeassistant.utils.DateTimeUtils;
 
@@ -122,6 +121,7 @@ public class MonthlyReport extends RealmObject {
                     .findFirst();
             if (updateMonthlyReport != null) {
                 final double newAmount = updateMonthlyReport.getAmount() + amount;
+                Log.d(TAG, "New Amount : " + newAmount);
                 updateMonthlyReport.setAmount(newAmount);
 
                 realm.insertOrUpdate(updateMonthlyReport);
